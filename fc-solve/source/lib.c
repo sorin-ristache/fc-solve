@@ -2145,10 +2145,9 @@ static inline fcs_iters_int get_num_times_long(fcs_user *const user)
     return user->iterations_board_started_at.num_checked_states +
            OBJ_STATS(user).num_checked_states
 #ifndef FCS_WITHOUT_MAX_NUM_STATES
-           -
-           user->init_num_checked_states.num_checked_states
+           - user->init_num_checked_states.num_checked_states
 #endif
-           ;
+        ;
 }
 
 #ifndef FCS_FREECELL_ONLY
@@ -3344,7 +3343,7 @@ static inline fc_solve_solve_process_ret_t resume_solution(fcs_user *const user)
             flare->was_solution_traced = false;
 #endif
 #ifdef FCS_WITHOUT_MAX_NUM_STATES
-                recycle_inst(instance);
+            recycle_inst(instance);
 #endif
 #ifdef FCS_WITH_FLARES
             if ((!(instance_item->minimal_flare)) ||
