@@ -2065,7 +2065,7 @@ typedef struct
 #endif
     fcs_soft_thread *soft_thread;
     DECLARE_IND_BUF_T(indirect_stacks_buffer)
-#define MAX_STATE_STRING_COPY_LEN 2048
+#define MAX_STATE_STRING_COPY_LEN 300
     char state_string_copy[MAX_STATE_STRING_COPY_LEN];
     FCS_ON_NOT_FC_ONLY(fcs_preset common_preset;)
     FCS__DECL_ERR_BUF(error_string)
