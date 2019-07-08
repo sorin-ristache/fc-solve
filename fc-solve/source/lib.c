@@ -1920,7 +1920,9 @@ typedef struct
 #ifndef FCS_WITHOUT_FC_PRO_MOVES_COUNT
     fcs_moves_processed fc_pro_moves;
 #endif
+#ifndef FCS_WITHOUT_MAX_NUM_STATES
     fcs_stats obj_stats;
+#endif
 #if defined(FCS_WITH_MOVES)
     bool was_solution_traced;
 #endif
@@ -2010,8 +2012,10 @@ typedef struct
     fcs_int_limit_t current_soft_iterations_limit;
 #endif
     fcs_stats iterations_board_started_at;
+#ifndef FCS_WITHOUT_MAX_NUM_STATES
     // The number of iterations that the current instance started solving from.
     fcs_stats init_num_checked_states;
+#endif
     // A pointer to the currently active flare out of the sequence
 #if defined(FCS_WITH_NI) || defined(FCS_WITH_FLARES)
 #define ACTIVE_FLARE(user) ((user)->active_flare)
@@ -2138,9 +2142,12 @@ static inline fcs_instance_item *curr_inst(fcs_user *const user)
 
 static inline fcs_iters_int get_num_times_long(fcs_user *const user)
 {
-    return user->iterations_board_started_at.num_checked_states +
-           OBJ_STATS(user).num_checked_states -
-           user->init_num_checked_states.num_checked_states;
+    return user->iterations_board_started_at.num_checked_states
+#ifndef FCS_WITHOUT_MAX_NUM_STATES
+           + OBJ_STATS(user).num_checked_states -
+           user->init_num_checked_states.num_checked_states
+#endif
+        ;
 }
 
 #ifndef FCS_FREECELL_ONLY
@@ -2299,7 +2306,9 @@ static FLARE_INLINE void user_next_flare(fcs_user *const user)
     flare->fc_pro_moves.moves = NULL;
 #endif
     flare->instance_is_ready = true;
+#ifndef FCS_WITHOUT_MAX_NUM_STATES
     flare->obj_stats = initial_stats;
+#endif
 }
 
 #ifdef FCS_WITH_NI
@@ -2830,6 +2839,7 @@ static void user__recycle_instance_item(
 #endif
     {
         recycle_flare(flare);
+#ifndef FCS_WITHOUT_MAX_NUM_STATES
         /*
          * We have to initialize init_num_checked_states to 0 here, because it
          * may
@@ -2839,7 +2849,6 @@ static void user__recycle_instance_item(
          * */
         user->init_num_checked_states = initial_stats;
 
-#ifndef FCS_WITHOUT_MAX_NUM_STATES
         flare->ret_code = FCS_STATE_NOT_BEGAN_YET;
 #endif
     }
@@ -2854,7 +2863,9 @@ static void user__recycle_instance_item(
     }
 #endif
 
+#ifndef FCS_WITHOUT_MAX_NUM_STATES
     flare->obj_stats = initial_stats;
+#endif
     INSTANCE_ITEM_FLARES_LOOP_END()
 
 #ifdef FCS_WITH_FLARES
@@ -3155,10 +3166,14 @@ static inline void flare__update_stats(
 #endif
 )
 {
+#ifndef FCS_WITHOUT_MAX_NUM_STATES
     flare->obj_stats = instance->i__stats;
     const_AUTO(delta, flare->obj_stats.num_checked_states -
                           user->init_num_checked_states.num_checked_states);
     user->iterations_board_started_at.num_checked_states += delta;
+#else
+    user->iterations_board_started_at = instance->i__stats;
+#endif
 #ifdef FCS_WITH_FLARES
     if (iters_quota >= 0)
     {
@@ -3171,7 +3186,9 @@ static inline void flare__update_stats(
         flare->obj_stats.num_states_in_collection -
         user->init_num_checked_states.num_states_in_collection;
 #endif
+#ifndef FCS_WITHOUT_MAX_NUM_STATES
     user->init_num_checked_states = flare->obj_stats;
+#endif
 }
 
 #ifdef FCS_WITH_NI
@@ -3243,8 +3260,8 @@ static inline fc_solve_solve_process_ret_t resume_solution(fcs_user *const user)
 #endif
         fcs_instance *const instance = &(flare->obj);
         SET_ACTIVE_FLARE(user, flare);
-        user->init_num_checked_states = instance->i__stats;
 #ifndef FCS_WITHOUT_MAX_NUM_STATES
+        user->init_num_checked_states = instance->i__stats;
         const bool began_now = (flare->ret_code == FCS_STATE_NOT_BEGAN_YET);
 #else
         const bool began_now = true;
@@ -3288,7 +3305,7 @@ static inline fc_solve_solve_process_ret_t resume_solution(fcs_user *const user)
 #else
         const bool was_run_now = true;
 #endif
-        ;
+
         if (was_run_now)
         {
             ret = SET_flare_ret(flare,
