@@ -728,6 +728,318 @@ static inline void recycle_inst(fcs_instance *const instance)
 #endif
 }
 
+#ifdef DEBUG
+#define TRACE0(message)                                                        \
+    fcs_trace("BestFS - %s ; Iters=%ld.\n", message,                           \
+        (long)(*instance_num_checked_states_ptr))
+#else
+#define TRACE0(no_use)
+#endif
+#define my_brfs_queue (BRFS_VAR(soft_thread, bfs_queue))
+#define my_brfs_queue_last_item (BRFS_VAR(soft_thread, bfs_queue_last_item))
+#define my_brfs_recycle_bin (BRFS_VAR(soft_thread, recycle_bin))
+#define WEIGHTING(soft_thread) (&(BEFS_VAR(soft_thread, weighting)))
+/* GCC does not handle inline functions as well as macros. */
+#define kv_calc_depth(ptr_state)                                               \
+    calc_depth(FCS_STATE_kv_to_collectible(ptr_state))
+
+#define NEW_BRFS_QUEUE_ITEM()                                                  \
+    ((fcs_states_linked_list_item *)fcs_compact_alloc_ptr(                     \
+        &(HT_FIELD(hard_thread, allocator)),                                   \
+        sizeof(fcs_states_linked_list_item)));
+static inline void befs__insert_derived_states(
+    fcs_soft_thread *const soft_thread, fcs_hard_thread *const hard_thread,
+    fcs_instance *instance GCC_UNUSED, const bool is_befs,
+    fcs_derived_states_list derived, pri_queue *const pqueue,
+    fcs_states_linked_list_item **queue_last_item)
+{
+    fcs_derived_states_list_item *derived_iter, *derived_end;
+    for (derived_end = (derived_iter = derived.states) + derived.num_states;
+         derived_iter < derived_end; derived_iter++)
+    {
+        const_AUTO(scans_ptr_new_state, derived_iter->state_ptr);
+        if (is_befs)
+        {
+#ifdef FCS_RCS_STATES
+            fcs_kv_state new_pass = {.key = fc_solve_lookup_state_key_from_val(
+                                         instance, scans_ptr_new_state),
+                .val = scans_ptr_new_state};
+#else
+            fcs_kv_state new_pass =
+                FCS_STATE_keyval_pair_to_kv(scans_ptr_new_state);
+#endif
+            fc_solve_pq_push(pqueue, scans_ptr_new_state,
+                befs_rate_state(soft_thread, WEIGHTING(soft_thread),
+                    new_pass.key, BEFS_MAX_DEPTH - kv_calc_depth(&(new_pass))));
+        }
+        else
+        {
+            /* Enqueue the new state. */
+            fcs_states_linked_list_item *last_item_next;
+
+            if (my_brfs_recycle_bin)
+            {
+                last_item_next = my_brfs_recycle_bin;
+                my_brfs_recycle_bin = my_brfs_recycle_bin->next;
+            }
+            else
+            {
+                last_item_next = NEW_BRFS_QUEUE_ITEM();
+            }
+
+            queue_last_item[0]->next = last_item_next;
+
+            queue_last_item[0]->s = scans_ptr_new_state;
+            last_item_next->next = NULL;
+            queue_last_item[0] = last_item_next;
+        }
+    }
+}
+
+// fc_solve_befs_or_bfs_do_solve() is the main event loop of the BeFS And
+// BFS scans. It is quite simple as all it does is extract elements out of
+// the queue or priority queue and run all the moves on them.
+//
+// It goes on in this fashion until the final state was reached or there are
+// no more states in the queue.
+static fc_solve_solve_process_ret_t fc_solve_befs_or_bfs_do_solve(
+    fcs_soft_thread *const soft_thread)
+{
+    fcs_hard_thread *const hard_thread = soft_thread->hard_thread;
+    fcs_instance *const instance = HT_INSTANCE(hard_thread);
+
+#if !defined(FCS_WITHOUT_DEPTH_FIELD) &&                                       \
+    !defined(FCS_HARD_CODE_CALC_REAL_DEPTH_AS_FALSE)
+    const bool calc_real_depth = fcs_get_calc_real_depth(instance);
+#endif
+#ifndef FCS_HARD_CODE_SCANS_SYNERGY_AS_TRUE
+    const bool scans_synergy =
+        STRUCT_QUERY_FLAG(instance, FCS_RUNTIME_SCANS_SYNERGY);
+#endif
+    const_AUTO(soft_thread_id, soft_thread->id);
+    const bool is_a_complete_scan =
+        STRUCT_QUERY_FLAG(soft_thread, FCS_SOFT_THREAD_IS_A_COMPLETE_SCAN);
+#ifndef FCS_DISABLE_NUM_STORED_STATES
+    const_SLOT(effective_max_num_states_in_collection, instance);
+#endif
+
+    fcs_states_linked_list_item *queue = NULL;
+    fcs_states_linked_list_item *queue_last_item = NULL;
+    pri_queue *pqueue = NULL;
+    fc_solve_solve_process_ret_t error_code;
+    fcs_derived_states_list derived = {.num_states = 0, .states = NULL};
+
+    const fcs_move_func *const moves_list = BEFS_M_VAR(soft_thread, moves_list);
+    const fcs_move_func *const moves_list_end =
+        BEFS_M_VAR(soft_thread, moves_list_end);
+
+    DECLARE_STATE();
+    PTR_STATE = BEFS_M_VAR(soft_thread, first_state_to_check);
+    FCS_ASSIGN_STATE_KEY();
+#ifndef FCS_ENABLE_PRUNE__R_TF__UNCOND
+    const bool enable_pruning = soft_thread->enable_pruning;
+#endif
+
+    fcs_iters_int *const instance_num_checked_states_ptr =
+        &(instance->i__stats.num_checked_states);
+#ifndef FCS_SINGLE_HARD_THREAD
+    fcs_iters_int *const hard_thread_num_checked_states_ptr =
+        &(HT_FIELD(hard_thread, ht__num_checked_states));
+#endif
+    const_SLOT(is_befs, soft_thread);
+#ifdef FCS_WITH_MOVES
+    const_SLOT(is_optimize_scan, soft_thread);
+#endif
+
+    if (is_befs)
+    {
+        pqueue = &(BEFS_VAR(soft_thread, pqueue));
+    }
+    else
+    {
+        queue = my_brfs_queue;
+        queue_last_item = my_brfs_queue_last_item;
+    }
+    FC__STACKS__SET_PARAMS();
+    const_AUTO(max_num_states, calc_ht_max_num_states(instance, hard_thread));
+#ifndef FCS_WITHOUT_ITER_HANDLER
+    const_SLOT(debug_iter_output_func, instance);
+    const_SLOT(debug_iter_output_context, instance);
+#endif
+
+    /* Continue as long as there are states in the queue or
+       priority queue. */
+    int8_t *const befs_positions_by_rank =
+        (BEFS_M_VAR(soft_thread, befs_positions_by_rank));
+
+    while (PTR_STATE != NULL)
+    {
+        TRACE0("Start of loop");
+        // If we do the pruning after checking for being visited, then
+        // there's a risk of inconsistent result when being interrupted
+        // because we check once for the pruned state (after the scan
+        // was suspended) and another time for the uninterrupted state.
+        //
+        // Therefore, we prune before checking for the visited flags.
+        if (fcs__should_state_be_pruned(enable_pruning, PTR_STATE))
+        {
+            fcs_collectible_state *const after_pruning_state =
+                fc_solve_sfs_raymond_prune(soft_thread, pass);
+            if (after_pruning_state)
+            {
+                ASSIGN_ptr_state(after_pruning_state);
+            }
+        }
+
+        register const int temp_visited = FCS_S_VISITED(PTR_STATE);
+
+        // If this is an optimization scan and the state being checked is
+        // not in the original solution path - move on to the next state
+        // If the state has already been visited - move on to the next
+        // state.
+        if (
+#ifdef FCS_WITH_MOVES
+            is_optimize_scan
+                ? ((!(temp_visited & FCS_VISITED_IN_SOLUTION_PATH)) ||
+                      (temp_visited & FCS_VISITED_IN_OPTIMIZED_PATH))
+                :
+#endif
+                ((temp_visited & FCS_VISITED_DEAD_END) ||
+                    (is_scan_visited(PTR_STATE, soft_thread_id))))
+        {
+            goto next_state;
+        }
+
+        TRACE0("Counting cells");
+        if (check_if_limits_exceeded())
+        {
+            BEFS_M_VAR(soft_thread, first_state_to_check) = PTR_STATE;
+            TRACE0("error_code - FCS_STATE_SUSPEND_PROCESS");
+            error_code = FCS_STATE_SUSPEND_PROCESS;
+            goto my_return_label;
+        }
+
+#ifndef FCS_WITHOUT_ITER_HANDLER
+        TRACE0("debug_iter_output");
+        if (debug_iter_output_func)
+        {
+            debug_iter_output_func(debug_iter_output_context,
+                (fcs_int_limit_t) * (instance_num_checked_states_ptr),
+                calc_depth(PTR_STATE), (void *)instance, &pass,
+#ifdef FCS_WITHOUT_VISITED_ITER
+                0
+#else
+                ((FCS_S_PARENT(PTR_STATE) == NULL)
+                        ? 0
+                        : (fcs_int_limit_t)FCS_S_VISITED_ITER(
+                              FCS_S_PARENT(PTR_STATE)))
+#endif
+            );
+        }
+#endif
+
+        const fcs_game_limit num_vacant_freecells = count_num_vacant_freecells(
+            LOCAL_FREECELLS_NUM, &FCS_SCANS_the_state);
+        const fcs_game_limit num_vacant_stacks =
+            count_num_vacant_stacks(LOCAL_STACKS_NUM, &FCS_SCANS_the_state);
+        if ((num_vacant_stacks == LOCAL_STACKS_NUM) &&
+            (num_vacant_freecells == LOCAL_FREECELLS_NUM))
+        {
+            BUMP_NUM_CHECKED_STATES();
+            error_code = FCS_STATE_WAS_SOLVED;
+            goto my_return_label;
+        }
+
+        calculate_real_depth(calc_real_depth, PTR_STATE);
+
+        soft_thread->num_vacant_freecells = num_vacant_freecells;
+        soft_thread->num_vacant_stacks = num_vacant_stacks;
+        fc_solve__calc_positions_by_rank_data(
+            soft_thread, &FCS_SCANS_the_state, befs_positions_by_rank);
+
+        TRACE0("perform_moves");
+        // Do all the tests at one go, because that is the way it should be
+        // done for BFS and BeFS.
+        derived.num_states = 0;
+        for (const fcs_move_func *move_func_ptr = moves_list;
+             move_func_ptr < moves_list_end; move_func_ptr++)
+        {
+            move_func_ptr->f(soft_thread, pass, &derived);
+        }
+
+        if (is_a_complete_scan)
+        {
+            FCS_S_VISITED(PTR_STATE) |= FCS_VISITED_ALL_TESTS_DONE;
+        }
+
+        BUMP_NUM_CHECKED_STATES();
+        TRACE0("Insert all states");
+        befs__insert_derived_states(soft_thread, hard_thread, instance, is_befs,
+            derived, pqueue, &queue_last_item);
+#ifdef FCS_WITH_MOVES
+        if (is_optimize_scan)
+        {
+            FCS_S_VISITED(PTR_STATE) |= FCS_VISITED_IN_OPTIMIZED_PATH;
+        }
+        else
+#endif
+        {
+            set_scan_visited(PTR_STATE, soft_thread_id);
+
+            if (derived.num_states == 0)
+            {
+                if (is_a_complete_scan)
+                {
+                    MARK_AS_DEAD_END(PTR_STATE);
+                }
+            }
+        }
+
+#ifndef FCS_WITHOUT_VISITED_ITER
+        FCS_S_VISITED_ITER(PTR_STATE) = *(instance_num_checked_states_ptr)-1;
+#endif
+
+    next_state:
+        TRACE0("Label next state");
+        fcs_collectible_state *new_ptr_state;
+        if (is_befs)
+        {
+            /* It is an BeFS scan */
+            fc_solve_pq_pop(pqueue, &(new_ptr_state));
+        }
+        else
+        {
+            const_AUTO(save_item, queue->next);
+            if (save_item != queue_last_item)
+            {
+                new_ptr_state = save_item->s;
+                queue->next = save_item->next;
+                save_item->next = my_brfs_recycle_bin;
+                my_brfs_recycle_bin = save_item;
+            }
+            else
+            {
+                new_ptr_state = NULL;
+            }
+        }
+        ASSIGN_ptr_state(new_ptr_state);
+    }
+
+    error_code = FCS_STATE_IS_NOT_SOLVEABLE;
+my_return_label:
+    FCS_SET_final_state();
+    if (derived.states != NULL)
+    {
+        free(derived.states);
+    }
+
+    if (!is_befs)
+    {
+        my_brfs_queue_last_item = queue_last_item;
+    }
+
+    return error_code;
+}
 #ifdef FCS_WITH_MOVES
 static inline void setup_opt_thread__helper(
     fcs_instance *const instance, fcs_soft_thread *const soft_thread)

@@ -754,9 +754,6 @@ struct fc_solve_instance_struct
 #include "pat.h"
 #endif
 
-extern fc_solve_solve_process_ret_t fc_solve_befs_or_bfs_do_solve(
-    fcs_soft_thread *const soft_thread);
-
 static inline void *memdup(const void *const src, const size_t my_size)
 {
     void *const dest = malloc(my_size);
