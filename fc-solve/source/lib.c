@@ -796,13 +796,19 @@ static inline void befs__insert_derived_states(
     }
 }
 
+#ifdef FCS_WITH_MOVES
+#define BEFS_INLINE
+#else
+#define BEFS_INLINE inline
+#endif
+
 // fc_solve_befs_or_bfs_do_solve() is the main event loop of the BeFS And
 // BFS scans. It is quite simple as all it does is extract elements out of
 // the queue or priority queue and run all the moves on them.
 //
 // It goes on in this fashion until the final state was reached or there are
 // no more states in the queue.
-static fc_solve_solve_process_ret_t fc_solve_befs_or_bfs_do_solve(
+static BEFS_INLINE fc_solve_solve_process_ret_t fc_solve_befs_or_bfs_do_solve(
     fcs_soft_thread *const soft_thread)
 {
     fcs_hard_thread *const hard_thread = soft_thread->hard_thread;
