@@ -758,19 +758,22 @@ static inline void befs__insert_derived_states(
          derived_iter < derived_end; derived_iter++)
     {
         const_AUTO(scans_ptr_new_state, derived_iter->state_ptr);
+#ifdef FCS_WITH_MOVES
         if (is_befs)
         {
+#endif
 #ifdef FCS_RCS_STATES
             fcs_kv_state new_pass = {.key = fc_solve_lookup_state_key_from_val(
                                          instance, scans_ptr_new_state),
                 .val = scans_ptr_new_state};
 #else
-            fcs_kv_state new_pass =
-                FCS_STATE_keyval_pair_to_kv(scans_ptr_new_state);
+        fcs_kv_state new_pass =
+            FCS_STATE_keyval_pair_to_kv(scans_ptr_new_state);
 #endif
             fc_solve_pq_push(pqueue, scans_ptr_new_state,
                 befs_rate_state(soft_thread, WEIGHTING(soft_thread),
                     new_pass.key, BEFS_MAX_DEPTH - kv_calc_depth(&(new_pass))));
+#ifdef FCS_WITH_MOVES
         }
         else
         {
@@ -793,13 +796,14 @@ static inline void befs__insert_derived_states(
             last_item_next->next = NULL;
             queue_last_item[0] = last_item_next;
         }
+#endif
     }
 }
 
 #ifdef FCS_WITH_MOVES
 #define BEFS_INLINE
 #else
-#define BEFS_INLINE inline
+#define BEFS_INLINE
 #endif
 
 // fc_solve_befs_or_bfs_do_solve() is the main event loop of the BeFS And
@@ -852,20 +856,26 @@ static BEFS_INLINE fc_solve_solve_process_ret_t fc_solve_befs_or_bfs_do_solve(
     fcs_iters_int *const hard_thread_num_checked_states_ptr =
         &(HT_FIELD(hard_thread, ht__num_checked_states));
 #endif
-    const_SLOT(is_befs, soft_thread);
 #ifdef FCS_WITH_MOVES
+    const_SLOT(is_befs, soft_thread);
     const_SLOT(is_optimize_scan, soft_thread);
+#else
+    const bool is_befs = true;
 #endif
 
+#ifdef FCS_WITH_MOVES
     if (is_befs)
     {
+#endif
         pqueue = &(BEFS_VAR(soft_thread, pqueue));
+#ifdef FCS_WITH_MOVES
     }
     else
     {
         queue = my_brfs_queue;
         queue_last_item = my_brfs_queue_last_item;
     }
+#endif
     FC__STACKS__SET_PARAMS();
     const_AUTO(max_num_states, calc_ht_max_num_states(instance, hard_thread));
 #ifndef FCS_WITHOUT_ITER_HANDLER
@@ -1008,10 +1018,13 @@ static BEFS_INLINE fc_solve_solve_process_ret_t fc_solve_befs_or_bfs_do_solve(
     next_state:
         TRACE0("Label next state");
         fcs_collectible_state *new_ptr_state;
+#ifdef FCS_WITH_MOVES
         if (is_befs)
         {
+#endif
             /* It is an BeFS scan */
             fc_solve_pq_pop(pqueue, &(new_ptr_state));
+#ifdef FCS_WITH_MOVES
         }
         else
         {
@@ -1028,6 +1041,7 @@ static BEFS_INLINE fc_solve_solve_process_ret_t fc_solve_befs_or_bfs_do_solve(
                 new_ptr_state = NULL;
             }
         }
+#endif
         ASSIGN_ptr_state(new_ptr_state);
     }
 
