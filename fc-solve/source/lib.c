@@ -750,8 +750,12 @@ static inline void recycle_inst(fcs_instance *const instance)
 static inline void befs__insert_derived_states(
     fcs_soft_thread *const soft_thread, fcs_hard_thread *const hard_thread,
     fcs_instance *instance GCC_UNUSED, const bool is_befs,
-    fcs_derived_states_list derived, pri_queue *const pqueue,
-    fcs_states_linked_list_item **queue_last_item)
+    fcs_derived_states_list derived, pri_queue *const pqueue
+#ifdef FCS_WITH_MOVES
+    ,
+    fcs_states_linked_list_item **queue_last_item
+#endif
+)
 {
     fcs_derived_states_list_item *derived_iter, *derived_end;
     for (derived_end = (derived_iter = derived.states) + derived.num_states;
@@ -833,8 +837,6 @@ static BEFS_INLINE fc_solve_solve_process_ret_t fc_solve_befs_or_bfs_do_solve(
     const_SLOT(effective_max_num_states_in_collection, instance);
 #endif
 
-    fcs_states_linked_list_item *queue = NULL;
-    fcs_states_linked_list_item *queue_last_item = NULL;
     pri_queue *pqueue = NULL;
     fc_solve_solve_process_ret_t error_code;
     fcs_derived_states_list derived = {.num_states = 0, .states = NULL};
@@ -859,6 +861,8 @@ static BEFS_INLINE fc_solve_solve_process_ret_t fc_solve_befs_or_bfs_do_solve(
 #ifdef FCS_WITH_MOVES
     const_SLOT(is_befs, soft_thread);
     const_SLOT(is_optimize_scan, soft_thread);
+    fcs_states_linked_list_item *queue = NULL;
+    fcs_states_linked_list_item *queue_last_item = NULL;
 #else
     const bool is_befs = true;
 #endif
@@ -990,8 +994,13 @@ static BEFS_INLINE fc_solve_solve_process_ret_t fc_solve_befs_or_bfs_do_solve(
 
         BUMP_NUM_CHECKED_STATES();
         TRACE0("Insert all states");
-        befs__insert_derived_states(soft_thread, hard_thread, instance, is_befs,
-            derived, pqueue, &queue_last_item);
+        befs__insert_derived_states(
+            soft_thread, hard_thread, instance, is_befs, derived, pqueue
+#ifdef FCS_WITH_MOVES
+            ,
+            &queue_last_item
+#endif
+        );
 #ifdef FCS_WITH_MOVES
         if (is_optimize_scan)
         {
@@ -1053,10 +1062,12 @@ my_return_label:
         free(derived.states);
     }
 
+#ifdef FCS_WITH_MOVES
     if (!is_befs)
     {
         my_brfs_queue_last_item = queue_last_item;
     }
+#endif
 
     return error_code;
 }
