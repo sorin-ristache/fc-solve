@@ -230,11 +230,13 @@ static inline
                                                     fc_solve_default_befs_weights,
                                             },
                                     },
+#ifdef FCS_WITH_MOVES
                                 .brfs =
                                     {
                                         .bfs_queue_last_item = NULL,
                                         .bfs_queue = NULL,
                                     },
+#endif
                             },
                     },
             },

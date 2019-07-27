@@ -262,6 +262,7 @@ fcs_state *fc_solve_lookup_state_key_from_val(fcs_instance *const instance,
         &(HT_FIELD(hard_thread, allocator)),                                   \
         sizeof(fcs_states_linked_list_item)));
 
+#ifdef FCS_WITH_MOVES
 static inline void fc_solve_initialize_bfs_queue(
     fcs_soft_thread *const soft_thread)
 {
@@ -274,6 +275,7 @@ static inline void fc_solve_initialize_bfs_queue(
     my_brfs_queue_last_item->next = NULL;
     my_brfs_recycle_bin = NULL;
 }
+#endif
 
 void fc_solve_soft_thread_init_befs_or_bfs(fcs_soft_thread *const soft_thread)
 {
