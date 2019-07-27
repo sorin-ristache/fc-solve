@@ -244,8 +244,8 @@ static inline
                 .by_depth_moves =
                     SMALLOC1(soft_thread->by_depth_moves_order.by_depth_moves),
             },
-        .is_befs = false,
 #ifdef FCS_WITH_MOVES
+        .is_befs = false,
         .is_optimize_scan = false,
 #endif
         .super_method_type = FCS_SUPER_METHOD_DFS,

@@ -277,17 +277,21 @@ static inline void fc_solve_initialize_bfs_queue(
 
 void fc_solve_soft_thread_init_befs_or_bfs(fcs_soft_thread *const soft_thread)
 {
+#ifdef FCS_WITH_MOVES
     if (soft_thread->is_befs)
     {
+#endif
 #define WEIGHTING(soft_thread) (&(BEFS_VAR(soft_thread, weighting)))
         /* Initialize the priotity queue of the BeFS scan */
         fc_solve_pq_init(&(BEFS_VAR(soft_thread, pqueue)));
         fc_solve_initialize_befs_rater(soft_thread, WEIGHTING(soft_thread));
+#ifdef FCS_WITH_MOVES
     }
     else
     {
         fc_solve_initialize_bfs_queue(soft_thread);
     }
+#endif
 
     if (!BEFS_M_VAR(soft_thread, moves_list))
     {
