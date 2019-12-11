@@ -1813,8 +1813,8 @@
   Test.count = 0;
 
   function getNotStartedModules(startModule) {
-  	var module = startModule,
-  	    modules = [];
+  	let module = startModule;
+    const modules = [];
 
   	while (module && module.testsRun === 0) {
   		modules.push(module);
@@ -1906,38 +1906,6 @@
   	after: function after() {
   	},
 
-  	queueHook: function queueHook(hook, hookName, hookOwner) {
-  		var _this2 = this;
-
-  		var callHook = function callHook() {
-  			var promise = hook.call(_this2.testEnvironment, _this2.assert);
-  			_this2.resolvePromise(promise, hookName);
-  		};
-
-  		var runHook = function runHook() {
-  			if (hookName === "before") {
-  				if (hookOwner.unskippedTestsRun !== 0) {
-  					return;
-  				}
-
-  				_this2.preserveEnvironment = true;
-  			}
-
-  			config.current = _this2;
-  			if (config.notrycatch) {
-  				callHook();
-  				return;
-  			}
-  			try {
-  				callHook();
-  			} catch (error) {
-  				_this2.pushFailure(hookName + " failed on " + _this2.testName + ": " + (error.message || error), extractStacktrace(error, 0));
-  			}
-  		};
-
-  		return runHook;
-  	},
-
   	// Currently only used for module level hooks, can be used to add global level ones
   	hooks: function hooks(handler) {
   		var hooks = [];
@@ -1947,11 +1915,6 @@
   				processHooks(test, module.parentModule);
   			}
 
-  			if (module.hooks[handler].length) {
-  				for (var i = 0; i < module.hooks[handler].length; i++) {
-  					hooks.push(test.queueHook(module.hooks[handler][i], handler, module));
-  				}
-  			}
   		}
 
   		// Hooks are ignored on skipped tests
