@@ -649,7 +649,6 @@
   	var testEnvironment = module.testEnvironment;
   	var moduleFns = {
   		before: setHookFunction(module, "before"),
-  		beforeEach: setHookFunction(module, "beforeEach"),
   		after: setHookFunction(module, "after")
   	};
 
@@ -1133,28 +1132,6 @@
 
   function extractStacktrace(e, offset) {
   	offset = offset === undefined ? 4 : offset;
-
-  	var stack, include, i;
-
-  	if (e && e.stack) {
-  		stack = e.stack.split("\n");
-  		if (/^error$/i.test(stack[0])) {
-  			stack.shift();
-  		}
-  		if (fileName) {
-  			include = [];
-  			for (i = offset; i < stack.length; i++) {
-  				if (stack[i].indexOf(fileName) !== -1) {
-  					break;
-  				}
-  				include.push(stack[i]);
-  			}
-  			if (include.length) {
-  				return include.join("\n");
-  			}
-  		}
-  		return stack[offset];
-  	}
   }
 
   function sourceFromStacktrace(offset) {
