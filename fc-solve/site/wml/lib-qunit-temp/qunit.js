@@ -5513,46 +5513,6 @@
   	// QUnit.onError function.
   	var originalWindowOnError = window$1.onerror;
 
-  	// Cover uncaught exceptions
-  	// Returning true will suppress the default browser handler,
-  	// returning false will let it run.
-  	window$1.onerror = function (message, fileName, lineNumber, columnNumber, errorObj) {
-  		var ret = false;
-  		if (originalWindowOnError) {
-  			for (var _len = arguments.length, args = Array(_len > 5 ? _len - 5 : 0), _key = 5; _key < _len; _key++) {
-  				args[_key - 5] = arguments[_key];
-  			}
-
-  			ret = originalWindowOnError.call.apply(originalWindowOnError, [this, message, fileName, lineNumber, columnNumber, errorObj].concat(args));
-  		}
-
-  		// Treat return value as window.onerror itself does,
-  		// Only do our handling if not suppressed.
-  		if (ret !== true) {
-  			var error = {
-  				message: message,
-  				fileName: fileName,
-  				lineNumber: lineNumber
-  			};
-
-  			// According to
-  			// https://blog.sentry.io/2016/01/04/client-javascript-reporting-window-onerror,
-  			// most modern browsers support an errorObj argument; use that to
-  			// get a full stack trace if it's available.
-  			if (errorObj && errorObj.stack) {
-  				error.stacktrace = extractStacktrace(errorObj, 0);
-  			}
-
-  			ret = QUnit.onError(error);
-  		}
-
-  		return ret;
-  	};
-
-  	// Listen for unhandled rejections, and call QUnit.onUnhandledRejection
-  	window$1.addEventListener("unhandledrejection", function (event) {
-  		QUnit.onUnhandledRejection(event.reason);
-  	});
   })();
 
 }((function() { return this; }())));
