@@ -2834,114 +2834,11 @@
   			});
   		}
   	}, {
-  		key: "notEqual",
-  		value: function notEqual(actual, expected, message) {
-
-  			// eslint-disable-next-line eqeqeq
-  			var result = expected != actual;
-
-  			this.pushResult({
-  				result: result,
-  				actual: actual,
-  				expected: expected,
-  				message: message,
-  				negative: true
-  			});
-  		}
-  	}, {
   		key: "deepEqual",
   		value: function deepEqual(actual, expected, message) {
   			this.pushResult({
   				result: true,
   				actual: actual,
-  				expected: expected,
-  				message: message
-  			});
-  		}
-  	}, {
-  		key: "strictEqual",
-  		value: function strictEqual(actual, expected, message) {
-  			this.pushResult({
-  				result: expected === actual,
-  				actual: actual,
-  				expected: expected,
-  				message: message
-  			});
-  		}
-  	}, {
-  		key: "notStrictEqual",
-  		value: function notStrictEqual(actual, expected, message) {
-  			this.pushResult({
-  				result: expected !== actual,
-  				actual: actual,
-  				expected: expected,
-  				message: message,
-  				negative: true
-  			});
-  		}
-  	}, {
-  		key: "throws",
-  		value: function throws(block, expected, message) {
-  			var actual = void 0,
-  			    result = false;
-
-  			var currentTest = this instanceof Assert && this.test || config.current;
-
-  			// 'expected' is optional unless doing string comparison
-  			if (objectType(expected) === "string") {
-  				if (message == null) {
-  					message = expected;
-  					expected = null;
-  				} else {
-  					throw new Error("throws/raises does not accept a string value for the expected argument.\n" + "Use a non-string object value (e.g. regExp) instead if it's necessary.");
-  				}
-  			}
-
-  			currentTest.ignoreGlobalErrors = true;
-  			try {
-  				block.call(currentTest.testEnvironment);
-  			} catch (e) {
-  				actual = e;
-  			}
-  			currentTest.ignoreGlobalErrors = false;
-
-  			if (actual) {
-  				var expectedType = objectType(expected);
-
-  				// We don't want to validate thrown error
-  				if (!expected) {
-  					result = true;
-
-  					// Expected is a regexp
-  				} else if (expectedType === "regexp") {
-  					result = expected.test(errorString(actual));
-
-  					// Log the string form of the regexp
-  					expected = String(expected);
-
-  					// Expected is a constructor, maybe an Error constructor
-  				} else if (expectedType === "function" && actual instanceof expected) {
-  					result = true;
-
-  					// Expected is an Error object
-  				} else if (expectedType === "object") {
-  					result = actual instanceof expected.constructor && actual.name === expected.name && actual.message === expected.message;
-
-  					// Log the string form of the Error object
-  					expected = errorString(expected);
-
-  					// Expected is a validation function which returns true if validation passed
-  				} else if (expectedType === "function" && expected.call({}, actual) === true) {
-  					expected = null;
-  					result = true;
-  				}
-  			}
-
-  			currentTest.assert.pushResult({
-  				result: result,
-
-  				// undefined if it didn't throw
-  				actual: actual && errorString(actual),
   				expected: expected,
   				message: message
   			});
@@ -3048,13 +2945,6 @@
   	}]);
   	return Assert;
   }();
-
-  // Provide an alternative to assert.throws(), for environments that consider throws a reserved word
-  // Known to us are: Closure Compiler, Narwhal
-  // eslint-disable-next-line dot-notation
-
-
-  Assert.prototype.raises = Assert.prototype["throws"];
 
   /**
    * Converts an error into a simple string for comparisons.
