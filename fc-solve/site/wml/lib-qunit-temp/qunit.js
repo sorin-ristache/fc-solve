@@ -3130,47 +3130,12 @@
   		});
   	}
 
-  	function toolbarUrlConfigContainer() {
-  		var urlConfigContainer = document.createElement("span");
-
-  		addClass(urlConfigContainer, "qunit-url-config");
-
-  		return urlConfigContainer;
-  	}
-
   	function abortTestsButton() {
   		var button = document.createElement("button");
   		button.id = "qunit-abort-tests-button";
   		button.innerHTML = "Abort";
   		addEvent(button, "click", abortTests);
   		return button;
-  	}
-
-  	function toolbarLooseFilter() {
-  		var filter = document.createElement("form"),
-  		    label = document.createElement("label"),
-  		    input = document.createElement("input"),
-  		    button = document.createElement("button");
-
-  		addClass(filter, "qunit-filter");
-
-  		label.innerHTML = "Filter: ";
-
-  		input.type = "text";
-  		input.value = config.filter || "";
-  		input.name = "filter";
-  		input.id = "qunit-filter-input";
-
-  		button.innerHTML = "Go";
-
-  		label.appendChild(input);
-
-  		filter.appendChild(label);
-  		filter.appendChild(document.createTextNode(" "));
-  		filter.appendChild(button);
-  		addEvent(filter, "submit", interceptNavigation);
-
-  		return filter;
   	}
 
   	function moduleListHtml() {
@@ -3188,165 +3153,10 @@
   		return html;
   	}
 
-  	function toolbarModuleFilter() {
-  		var commit,
-  		    reset,
-  		    moduleFilter = document.createElement("form"),
-  		    label = document.createElement("label"),
-  		    moduleSearch = document.createElement("input"),
-  		    dropDown = document.createElement("div"),
-  		    actions = document.createElement("span"),
-  		    applyButton = document.createElement("button"),
-  		    resetButton = document.createElement("button"),
-  		    allModulesLabel = document.createElement("label"),
-  		    allCheckbox = document.createElement("input"),
-  		    dropDownList = document.createElement("ul"),
-  		    dirty = false;
-
-  		moduleSearch.id = "qunit-modulefilter-search";
-  		moduleSearch.autocomplete = "off";
-  		addEvent(moduleSearch, "input", searchInput);
-  		addEvent(moduleSearch, "input", searchFocus);
-  		addEvent(moduleSearch, "focus", searchFocus);
-  		addEvent(moduleSearch, "click", searchFocus);
-
-  		label.id = "qunit-modulefilter-search-container";
-  		label.innerHTML = "Module: ";
-  		label.appendChild(moduleSearch);
-
-  		applyButton.textContent = "Apply";
-  		applyButton.style.display = "none";
-
-  		resetButton.textContent = "Reset";
-  		resetButton.type = "reset";
-  		resetButton.style.display = "none";
-
-  		allCheckbox.type = "checkbox";
-  		allCheckbox.checked = config.moduleId.length === 0;
-
-  		allModulesLabel.className = "clickable";
-  		if (config.moduleId.length) {
-  			allModulesLabel.className = "checked";
-  		}
-  		allModulesLabel.appendChild(allCheckbox);
-  		allModulesLabel.appendChild(document.createTextNode("All modules"));
-
-  		actions.id = "qunit-modulefilter-actions";
-  		actions.appendChild(applyButton);
-  		actions.appendChild(resetButton);
-  		actions.appendChild(allModulesLabel);
-  		commit = actions.firstChild;
-  		reset = commit.nextSibling;
-  		addEvent(commit, "click", applyUrlParams);
-
-  		dropDownList.id = "qunit-modulefilter-dropdown-list";
-  		dropDownList.innerHTML = moduleListHtml();
-
-  		dropDown.id = "qunit-modulefilter-dropdown";
-  		dropDown.style.display = "none";
-  		dropDown.appendChild(actions);
-  		dropDown.appendChild(dropDownList);
-  		addEvent(dropDown, "change", selectionChange);
-  		selectionChange();
-
-  		moduleFilter.id = "qunit-modulefilter";
-  		moduleFilter.appendChild(label);
-  		moduleFilter.appendChild(dropDown);
-  		addEvent(moduleFilter, "submit", interceptNavigation);
-  		addEvent(moduleFilter, "reset", function () {
-
-  			// Let the reset happen, then update styles
-  			window$1.setTimeout(selectionChange);
-  		});
-
-  		// Enables show/hide for the dropdown
-  		function searchFocus() {
-  			if (dropDown.style.display !== "none") {
-  				return;
-  			}
-
-  			dropDown.style.display = "block";
-  			addEvent(document, "click", hideHandler);
-  			addEvent(document, "keydown", hideHandler);
-
-  			// Hide on Escape keydown or outside-container click
-  			function hideHandler(e) {
-  				var inContainer = moduleFilter.contains(e.target);
-
-  				if (e.keyCode === 27 || !inContainer) {
-  					if (e.keyCode === 27 && inContainer) {
-  						moduleSearch.focus();
-  					}
-  					dropDown.style.display = "none";
-  					removeEvent(document, "click", hideHandler);
-  					removeEvent(document, "keydown", hideHandler);
-  					moduleSearch.value = "";
-  					searchInput();
-  				}
-  			}
-  		}
-
-  		// Processes module search box input
-  		function searchInput() {
-  			var i,
-  			    item,
-  			    searchText = moduleSearch.value.toLowerCase(),
-  			    listItems = dropDownList.children;
-
-  			for (i = 0; i < listItems.length; i++) {
-  				item = listItems[i];
-  				if (!searchText || item.textContent.toLowerCase().indexOf(searchText) > -1) {
-  					item.style.display = "";
-  				} else {
-  					item.style.display = "none";
-  				}
-  			}
-  		}
-
-  		// Processes selection changes
-  		function selectionChange(evt) {
-  			var i,
-  			    item,
-  			    checkbox = evt && evt.target || allCheckbox,
-  			    modulesList = dropDownList.getElementsByTagName("input"),
-  			    selectedNames = [];
-
-  			toggleClass(checkbox.parentNode, "checked", checkbox.checked);
-
-  			dirty = false;
-  			if (checkbox.checked && checkbox !== allCheckbox) {
-  				allCheckbox.checked = false;
-  				removeClass(allCheckbox.parentNode, "checked");
-  			}
-  			for (i = 0; i < modulesList.length; i++) {
-  				item = modulesList[i];
-  				if (!evt) {
-  					toggleClass(item.parentNode, "checked", item.checked);
-  				} else if (checkbox === allCheckbox && checkbox.checked) {
-  					item.checked = false;
-  					removeClass(item.parentNode, "checked");
-  				}
-  				dirty = dirty || item.checked !== item.defaultChecked;
-  				if (item.checked) {
-  					selectedNames.push(item.parentNode.textContent);
-  				}
-  			}
-
-  			commit.style.display = reset.style.display = dirty ? "" : "none";
-  			moduleSearch.placeholder = selectedNames.join(", ") || allCheckbox.parentNode.textContent;
-  			moduleSearch.title = "Type to filter list. Current selection:\n" + (selectedNames.join("\n") || allCheckbox.parentNode.textContent);
-  		}
-
-  		return moduleFilter;
-  	}
-
   	function appendToolbar() {
   		var toolbar = id("qunit-testrunner-toolbar");
 
   		if (toolbar) {
-  			toolbar.appendChild(toolbarUrlConfigContainer());
-  			toolbar.appendChild(toolbarModuleFilter());
-  			toolbar.appendChild(toolbarLooseFilter());
   			toolbar.appendChild(document.createElement("div")).className = "clearfix";
   		}
   	}
