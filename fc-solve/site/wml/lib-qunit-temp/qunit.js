@@ -3014,47 +3014,6 @@
   		elem.addEventListener(type, fn, false);
   	}
 
-  	function removeEvent(elem, type, fn) {
-  		elem.removeEventListener(type, fn, false);
-  	}
-
-  	function addEvents(elems, type, fn) {
-  		var i = elems.length;
-  		while (i--) {
-  			addEvent(elems[i], type, fn);
-  		}
-  	}
-
-  	function hasClass(elem, name) {
-  		return (" " + elem.className + " ").indexOf(" " + name + " ") >= 0;
-  	}
-
-  	function addClass(elem, name) {
-  		if (!hasClass(elem, name)) {
-  			elem.className += (elem.className ? " " : "") + name;
-  		}
-  	}
-
-  	function toggleClass(elem, name, force) {
-  		if (force || typeof force === "undefined" && !hasClass(elem, name)) {
-  			addClass(elem, name);
-  		} else {
-  			removeClass(elem, name);
-  		}
-  	}
-
-  	function removeClass(elem, name) {
-  		var set = " " + elem.className + " ";
-
-  		// Class name may appear multiple times
-  		while (set.indexOf(" " + name + " ") >= 0) {
-  			set = set.replace(" " + name + " ", " ");
-  		}
-
-  		// Trim for prettiness
-  		elem.className = typeof set.trim === "function" ? set.trim() : set.replace(/^\s+|\s+$/g, "");
-  	}
-
   	function id(name) {
   		return document.getElementById && document.getElementById(name);
   	}
