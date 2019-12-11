@@ -766,16 +766,7 @@
     return typeof x === 'function';
   }
 
-  var _isArray = void 0;
-  if (Array.isArray) {
-    _isArray = Array.isArray;
-  } else {
-    _isArray = function _isArray(x) {
-      return Object.prototype.toString.call(x) === '[object Array]';
-    };
-  }
-
-  var isArray = _isArray;
+  const isArray = Array.isArray;
 
   var len = 0;
   var vertxNext = void 0;
