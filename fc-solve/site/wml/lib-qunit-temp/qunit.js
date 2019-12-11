@@ -3153,115 +3153,6 @@
   		return html;
   	}
 
-  	function appendToolbar() {
-  		var toolbar = id("qunit-testrunner-toolbar");
-
-  		if (toolbar) {
-  			toolbar.appendChild(document.createElement("div")).className = "clearfix";
-  		}
-  	}
-
-  	function appendHeader() {
-  		var header = id("qunit-header");
-
-  		if (header) {
-  			header.innerHTML = "<a href='" + escapeText(unfilteredUrl) + "'>" + header.innerHTML + "</a> ";
-  		}
-  	}
-
-  	function appendBanner() {
-  		var banner = id("qunit-banner");
-
-  		if (banner) {
-  			banner.className = "";
-  		}
-  	}
-
-  	function appendTestResults() {
-  		var tests = id("qunit-tests"),
-  		    result = id("qunit-testresult"),
-  		    controls;
-
-  		if (result) {
-  			result.parentNode.removeChild(result);
-  		}
-
-  		if (tests) {
-  			tests.innerHTML = "";
-  			result = document.createElement("p");
-  			result.id = "qunit-testresult";
-  			result.className = "result";
-  			tests.parentNode.insertBefore(result, tests);
-  			result.innerHTML = "<div id=\"qunit-testresult-display\">Running...<br />&#160;</div>" + "<div id=\"qunit-testresult-controls\"></div>" + "<div class=\"clearfix\"></div>";
-  			controls = id("qunit-testresult-controls");
-  		}
-
-  		if (controls) {
-  			controls.appendChild(abortTestsButton());
-  		}
-  	}
-
-  	function appendFilteredTest() {
-  		var testId = QUnit.config.testId;
-  		if (!testId || testId.length <= 0) {
-  			return "";
-  		}
-  		return "<div id='qunit-filteredTest'>Rerunning selected tests: " + escapeText(testId.join(", ")) + " <a id='qunit-clearFilter' href='" + escapeText(unfilteredUrl) + "'>Run all tests</a></div>";
-  	}
-
-  	function appendUserAgent() {
-  		var userAgent = id("qunit-userAgent");
-
-  		if (userAgent) {
-  			userAgent.innerHTML = "";
-  			userAgent.appendChild(document.createTextNode("QUnit " + QUnit.version + "; " + navigator.userAgent));
-  		}
-  	}
-
-  	function appendInterface() {
-  		var qunit = id("qunit");
-
-  		if (qunit) {
-  			qunit.innerHTML = "<h1 id='qunit-header'>" + escapeText(document.title) + "</h1>" + "<h2 id='qunit-banner'></h2>" + "<div id='qunit-testrunner-toolbar'></div>" + appendFilteredTest() + "<h2 id='qunit-userAgent'></h2>" + "<ol id='qunit-tests'></ol>";
-  		}
-
-  		appendHeader();
-  		appendBanner();
-  		appendTestResults();
-  		appendUserAgent();
-  		appendToolbar();
-  	}
-
-  	function appendTest(name, testId, moduleName) {
-  		var title,
-  		    rerunTrigger,
-  		    testBlock,
-  		    assertList,
-  		    tests = id("qunit-tests");
-
-  		if (!tests) {
-  			return;
-  		}
-
-  		title = document.createElement("strong");
-
-  		rerunTrigger = document.createElement("a");
-  		rerunTrigger.innerHTML = "Rerun";
-  		rerunTrigger.href = setUrl({ testId: testId });
-
-  		testBlock = document.createElement("li");
-  		testBlock.appendChild(title);
-  		testBlock.appendChild(rerunTrigger);
-  		testBlock.id = "qunit-test-output-" + testId;
-
-  		assertList = document.createElement("ol");
-  		assertList.className = "qunit-assert-list";
-
-  		testBlock.appendChild(assertList);
-
-  		tests.appendChild(testBlock);
-  	}
-
   	// HTML Reporter initialization and load
   	QUnit.begin(function (details) {
   		var i, moduleObj;
@@ -3278,7 +3169,6 @@
   		});
 
   		// Initialize QUnit elements
-  		appendInterface();
   	});
 
   	QUnit.done(function (details) {
