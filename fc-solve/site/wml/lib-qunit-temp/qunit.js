@@ -1824,24 +1824,6 @@
     return new Enumerator(this, entries).promise;
   }
 
-  function race(entries) {
-    /*jshint validthis:true */
-    var Constructor = this;
-
-    if (!isArray(entries)) {
-      return new Constructor(function (_, reject) {
-        return reject(new TypeError('You must pass an array to race.'));
-      });
-    } else {
-      return new Constructor(function (resolve, reject) {
-        var length = entries.length;
-        for (var i = 0; i < length; i++) {
-          Constructor.resolve(entries[i]).then(resolve, reject);
-        }
-      });
-    }
-  }
-
   function reject$1(reason) {
     /*jshint validthis:true */
     var Constructor = this;
@@ -1904,7 +1886,6 @@
 
   Promise$2.prototype.then = then;
   Promise$2.all = all;
-  Promise$2.race = race;
   Promise$2.resolve = resolve$1;
   Promise$2.reject = reject$1;
   Promise$2._setScheduler = setScheduler;
