@@ -50,7 +50,6 @@
       for (var i = 0; i < props.length; i++) {
         var descriptor = props[i];
         descriptor.enumerable = descriptor.enumerable || false;
-        if ("value" in descriptor) descriptor.writable = true;
         Object.defineProperty(target, descriptor.key, descriptor);
       }
     }
@@ -199,17 +198,11 @@
   	// very useful in combination with "Hide passed tests" checked
   	reorder: true,
 
-  	// By default, scroll to top of the page when suite is done
-  	scrolltop: true,
-
   	// Depth up-to which object will be dumped
   	maxDepth: 5,
 
   	// When enabled, all tests must call expect()
   	requireExpects: false,
-
-  	// Placeholder for user-configurable form-exposed URL parameters
-  	urlConfig: [],
 
   	// Set of all modules.
   	modules: [],
@@ -327,8 +320,6 @@
   				type = "date";
   			} else if (is("function", obj)) {
   				type = "function";
-  			} else if (obj.setInterval !== undefined && obj.document !== undefined && obj.nodeType === undefined) {
-  				type = "window";
   			} else if (obj.nodeType === 9) {
   				type = "document";
   			} else if (obj.nodeType) {
@@ -386,7 +377,6 @@
   			error: function error(_error) {
   				return "Error(\"" + _error.message + "\")";
   			},
-  			unknown: "[Unknown]",
   			"null": "null",
   			"undefined": "undefined",
   			"function": function (fn) {
@@ -447,8 +437,6 @@
   			// Object calls it internally, the key part of an item in a map
   			key: quote,
 
-  			string: quote,
-  			regexp: literal,
   			"boolean": literal,
   			symbol: function symbol(sym) {
   				return sym.toString();
@@ -701,7 +689,6 @@
   const isArray = Array.isArray;
 
   var len = 0;
-  var vertxNext = void 0;
   var customSchedulerFn = void 0;
 
   var asap = function asap(callback, arg) {
@@ -716,10 +703,6 @@
       }
     }
   };
-
-  function setAsap(asapFn) {
-    asap = asapFn;
-  }
 
   // node
   function useNextTick() {
@@ -993,7 +976,7 @@
     try {
       resolver(function resolvePromise(value) {
         resolve(promise, value);
-      }, function rejectPromise(reason) {
+      }, function (reason) {
         reject(promise, reason);
       });
     } catch (e) {
@@ -1011,10 +994,6 @@
     promise._state = undefined;
     promise._result = undefined;
     promise._subscribers = [];
-  }
-
-  function validationError() {
-    return new Error('Array Methods must be provided an Array');
   }
 
   function reject$1(reason) {
@@ -1298,7 +1277,6 @@
   	finished: false,
   	add: addToTestQueue,
   	advance: advance,
-  	taskCount: taskQueueLength
   };
 
   var TestReport = function () {
@@ -1899,12 +1877,6 @@
   	test.queue();
   }
 
-  // Resets config.timeout with a new timeout duration.
-  function resetTestTimeout(timeoutDuration) {
-  	clearTimeout(config.timeout);
-  	config.timeout = setTimeout$1(config.timeoutHandler(timeoutDuration), timeoutDuration);
-  }
-
   // Forcefully release all processing holds.
   function internalRecover(test) {
   	test.semaphore = 0;
@@ -1998,7 +1970,7 @@
 
   	createClass(Assert, [{
   		key: "step",
-  		value: function step(message) {
+  		value: function (message) {
   			var assertionMessage = message;
   			var result = !!message;
 
@@ -2327,7 +2299,6 @@
   		// The test run is officially beginning now
   		emit("runStart", globalSuite.start(true));
   		runLoggingCallbacks("begin", {
-  			totalTests: Test.count,
   			modules: modulesLog
   		}).then(unblockAndAdvanceQueue);
   	} else {
@@ -2338,8 +2309,6 @@
   exportQUnit(QUnit);
 
   var stats = {
-  	skippedTests: 0,
-  	todoTests: 0
   };
 
 }((function() { return this; }())));
