@@ -85,10 +85,7 @@
 
   	// `performance.measure` may fail if the mark could not be found.
   	// reasons a specific mark could not be found include: outside code invoking `performance.clearMarks()`
-  	try {
-  		performance.measure(comment, startMark, endMark);
-  	} catch (ex) {
-  	}
+    performance.measure(comment, startMark, endMark);
   }
 
   var defined = {
@@ -467,7 +464,6 @@
   			functionCode: "[code]",
 
   			string: quote,
-  			date: quote,
   			regexp: literal,
   			number: literal,
   			"boolean": literal,
@@ -1381,7 +1377,6 @@
   			return extend(this.start(), {
   				runtime: this.getRuntime(),
   				status: this.getStatus(),
-  				errors: this.getFailedAssertions(),
   				assertions: this.getAssertions()
   			});
   		}
