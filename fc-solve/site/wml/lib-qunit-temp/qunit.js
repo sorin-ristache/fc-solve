@@ -232,12 +232,6 @@
   		childModules: [],
   		testsRun: 0,
   		unskippedTestsRun: 0,
-  		hooks: {
-  			before: [],
-  			beforeEach: [],
-  			afterEach: [],
-  			after: []
-  		}
   	},
 
   	callbacks: {},
@@ -689,15 +683,7 @@
 
   	var module = createModule(name, options, modifiers);
 
-  	// Move any hooks to a 'hooks' object
   	var testEnvironment = module.testEnvironment;
-  	var hooks = module.hooks = {};
-
-  	setHookFromEnvironment(hooks, testEnvironment, "before");
-  	setHookFromEnvironment(hooks, testEnvironment, "beforeEach");
-  	setHookFromEnvironment(hooks, testEnvironment, "afterEach");
-  	setHookFromEnvironment(hooks, testEnvironment, "after");
-
   	var moduleFns = {
   		before: setHookFunction(module, "before"),
   		beforeEach: setHookFunction(module, "beforeEach"),
@@ -716,17 +702,6 @@
 
   	config.currentModule = module;
 
-  	function setHookFromEnvironment(hooks, environment, name) {
-  		var potentialHook = environment[name];
-  		hooks[name] = typeof potentialHook === "function" ? [potentialHook] : [];
-  		delete environment[name];
-  	}
-
-  	function setHookFunction(module, hookName) {
-  		return function setHook(callback) {
-  			module.hooks[hookName].push(callback);
-  		};
-  	}
   }
 
   function module$1(name, options, executeNow) {
@@ -1906,13 +1881,6 @@
   	after: function after() {
   	},
 
-  	// Currently only used for module level hooks, can be used to add global level ones
-  	hooks: function hooks(handler) {
-  		var hooks = [];
-
-  		return hooks;
-  	},
-
   	finish: function finish() {
   		config.current = this;
 
@@ -2015,10 +1983,6 @@
 
   		function logSuiteEnd(module) {
 
-  			// Reset `module.hooks` to ensure that anything referenced in these hooks
-  			// has been released to be garbage collected.
-  			module.hooks = {};
-
   			emit("suiteEnd", module.suiteReport.end(true));
   			return runLoggingCallbacks("moduleDone", {
   				name: module.name,
@@ -2048,12 +2012,6 @@
   		function runTest() {
   			return [function () {
   				return test.before();
-  			}].concat(toConsumableArray(test.hooks("before")), [function () {
-  				test.preserveTestEnvironment();
-  			}], toConsumableArray(test.hooks("beforeEach")), [function () {
-  				test.run();
-  			}], toConsumableArray(test.hooks("afterEach").reverse()), toConsumableArray(test.hooks("after").reverse()), [function () {
-  				test.after();
   			}, function () {
   				return test.finish();
   			}]);
