@@ -13,17 +13,17 @@
 
   global$1 = global$1 && global$1.hasOwnProperty('default') ? global$1['default'] : global$1;
 
-  var window$1 = global$1.window;
-  var self$1 = global$1.self;
-  var console = global$1.console;
-  var setTimeout$1 = global$1.setTimeout;
-  var clearTimeout = global$1.clearTimeout;
+  const window$1 = global$1.window;
+  const self$1 = global$1.self;
+  const console = global$1.console;
+  const setTimeout$1 = global$1.setTimeout;
+  const clearTimeout = global$1.clearTimeout;
 
-  var document$1 = window$1 && window$1.document;
-  var navigator = window$1 && window$1.navigator;
+  const document$1 = window$1 && window$1.document;
+  const navigator = window$1 && window$1.navigator;
 
-  var localSessionStorage = function () {
-  	var x = "qunit-test-string";
+  const localSessionStorage = function () {
+  	const x = "qunit-test-string";
   	try {
   		global$1.sessionStorage.setItem(x, x);
   		global$1.sessionStorage.removeItem(x);
