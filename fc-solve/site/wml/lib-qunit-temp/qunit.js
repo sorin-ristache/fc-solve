@@ -72,14 +72,14 @@
     }
   };
 
-  var toString = Object.prototype.toString;
-  var hasOwn = Object.prototype.hasOwnProperty;
-  var now = Date.now || function () {
+  const toString = Object.prototype.toString;
+  const hasOwn = Object.prototype.hasOwnProperty;
+  const now = Date.now || function () {
   	return new Date().getTime();
   };
 
-  var hasPerformanceApi = false;
-  var performance = hasPerformanceApi ? window$1.performance : undefined;
+  const hasPerformanceApi = false;
+  const performance = hasPerformanceApi ? window$1.performance : undefined;
 
   function measure(comment, startMark, endMark) {
 
@@ -169,8 +169,6 @@
   		hash |= 0;
   	}
 
-  	// Convert the possibly negative integer hash code into an 8 character hex string, which isn't
-  	// strictly necessary but increases user understanding that the id is a SHA-like hash
   	var hex = (0x100000000 + hash).toString(16);
   	if (hex.length < 8) {
   		hex = "0000000" + hex;
@@ -1687,7 +1685,6 @@
   			throw new Error("Assertion occurred after test had finished.");
   		}
 
-  		// Destructure of resultInfo = { result, actual, expected, message, negative }
   		var source,
   		    details = {
   			module: this.module.name,
@@ -1696,7 +1693,6 @@
   			message: resultInfo.message,
   			actual: resultInfo.actual,
   			testId: this.testId,
-  			negative: resultInfo.negative || false,
   			runtime: now() - this.started,
   			todo: !!this.todo
   		};
@@ -2005,7 +2001,7 @@
 
   	}, {
   		key: "push",
-  		value: function push(result, actual, expected, message, negative) {
+  		value: function push(result, actual, expected, message, ) {
 
   			var currentAssert = this instanceof Assert ? this : config.current.assert;
   			return currentAssert.pushResult({
@@ -2013,14 +2009,12 @@
   				actual: actual,
   				expected: expected,
   				message: message,
-  				negative: negative
   			});
   		}
   	}, {
   		key: "pushResult",
   		value: function pushResult(resultInfo) {
 
-  			// Destructure of resultInfo = { result, actual, expected, message, negative }
   			var assert = this;
   			var currentTest = assert instanceof Assert && assert.test || config.current;
 
