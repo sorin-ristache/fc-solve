@@ -5212,12 +5212,6 @@
   		}
   	});
 
-  	function stripHtml(string) {
-
-  		// Strip tags, html entity and whitespaces
-  		return string.replace(/<\/?[^>]+(>|$)/g, "").replace(/&quot;/g, "").replace(/\s+/g, "");
-  	}
-
   	QUnit.log(function (details) {
   		var assertList,
   		    assertLi,
@@ -5263,7 +5257,7 @@
   					diff$$1 = QUnit.diff(expected, actual);
 
   					// don't show diff if there is zero overlap
-  					showDiff = stripHtml(diff$$1).length !== stripHtml(expected).length + stripHtml(actual).length;
+  					showDiff = '';
   				}
 
   				if (showDiff) {
