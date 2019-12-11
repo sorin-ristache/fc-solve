@@ -450,38 +450,6 @@
   				dump.down();
   				return join("{", ret, "}");
   			},
-  			node: function node(_node) {
-  				var len,
-  				    i,
-  				    val,
-  				    open = dump.HTML ? "&lt;" : "<",
-  				    close = dump.HTML ? "&gt;" : ">",
-  				    tag = _node.nodeName.toLowerCase(),
-  				    ret = open + tag,
-  				    attrs = _node.attributes;
-
-  				if (attrs) {
-  					for (i = 0, len = attrs.length; i < len; i++) {
-  						val = attrs[i].nodeValue;
-
-  						// IE6 includes all attributes in .attributes, even ones not explicitly
-  						// set. Those have values like undefined, null, 0, false, "" or
-  						// "inherit".
-  						if (val && val !== "inherit") {
-  							ret += " " + attrs[i].nodeName + "=";
-  						}
-  					}
-  				}
-  				ret += close;
-
-  				// Show content of TextNode or CDATASection
-  				if (_node.nodeType === 3 || _node.nodeType === 4) {
-  					ret += _node.nodeValue;
-  				}
-
-  				return ret + open + "/" + tag + close;
-  			},
-
   			// Function calls it internally, it's the arguments part of the function
   			functionArgs: function functionArgs(fn) {
   				var args,
