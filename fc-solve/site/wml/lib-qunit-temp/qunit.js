@@ -1173,28 +1173,6 @@
 
   var Promise$1 = typeof Promise !== "undefined" ? Promise : Promise$2;
 
-  function runLoggingCallbacks(key, args) {
-  	var callbacks = config.callbacks[key];
-
-  	// Handling 'log' callbacks separately. Unlike the other callbacks,
-  	// the log callback is not controlled by the processing queue,
-  	// but rather used by asserts. Hence to promisfy the 'log' callback
-  	// would mean promisfying each step of a test
-  	if (key === "log") {
-  		callbacks.map(function (callback) {
-  			return callback(args);
-  		});
-  		return;
-  	}
-
-  	// ensure that each callback is executed serially
-  	return callbacks.reduce(function (promiseChain, callback) {
-  		return promiseChain.then(function () {
-  			return Promise$1.resolve(callback(args));
-  		});
-  	}, Promise$1.resolve([]));
-  }
-
   // Doesn't support IE9, it will return undefined on these browsers
   // See also https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Error/Stack
   var fileName = (sourceFromStacktrace(0) || "").replace(/(:\d+)+\)?/, "").replace(/.+\//, "");
