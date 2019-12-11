@@ -716,7 +716,6 @@
   	processModule(name, options, executeNow, { todo: true });
   };
 
-  var LISTENERS = Object.create(null);
   var SUPPORTED_EVENTS = ["runStart", "suiteStart", "testStart", "assertion", "testEnd", "suiteEnd", "runEnd"];
 
   /**
@@ -734,14 +733,6 @@
   function emit(eventName, data) {
   	if (objectType(eventName) !== "string") {
   		throw new TypeError("eventName must be a string when emitting an event");
-  	}
-
-  	// Clone the callbacks in case one of them registers a new callback
-  	var originalCallbacks = LISTENERS[eventName];
-  	var callbacks = originalCallbacks ? [].concat(toConsumableArray(originalCallbacks)) : [];
-
-  	for (var i = 0; i < callbacks.length; i++) {
-  		callbacks[i](data);
   	}
   }
 
@@ -764,14 +755,6 @@
   		throw new TypeError("callback must be a function when registering a listener");
   	}
 
-  	if (!LISTENERS[eventName]) {
-  		LISTENERS[eventName] = [];
-  	}
-
-  	// Don't register the same callback more than once
-  	if (!inArray(callback, LISTENERS[eventName])) {
-  		LISTENERS[eventName].push(callback);
-  	}
   }
 
   function objectOrFunction(x) {
