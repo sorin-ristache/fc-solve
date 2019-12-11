@@ -1335,42 +1335,6 @@
   Promise$2._setAsap = setAsap;
   Promise$2._asap = asap;
 
-  /*global self*/
-  function polyfill() {
-    var local = void 0;
-
-    if (typeof global !== 'undefined') {
-      local = global;
-    } else if (typeof self !== 'undefined') {
-      local = self;
-    } else {
-      try {
-        local = Function('return this')();
-      } catch (e) {
-        throw new Error('polyfill failed because global object is unavailable in this environment');
-      }
-    }
-
-    var P = local.Promise;
-
-    if (P) {
-      var promiseToString = null;
-      try {
-        promiseToString = Object.prototype.toString.call(P.resolve());
-      } catch (e) {
-        // silently ignored
-      }
-
-      if (promiseToString === '[object Promise]' && !P.cast) {
-        return;
-      }
-    }
-
-    local.Promise = Promise$2;
-  }
-
-  // Strange compat..
-  Promise$2.polyfill = polyfill;
   Promise$2.Promise = Promise$2;
 
   var Promise$1 = typeof Promise !== "undefined" ? Promise : Promise$2;
