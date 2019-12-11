@@ -203,9 +203,6 @@
   	// very useful in combination with "Hide passed tests" checked
   	reorder: true,
 
-  	// By default, modify document.title when suite is done
-  	altertitle: true,
-
   	// HTML Reporter: collapse every test except the first failing test
   	// If false, all failing tests will be expanded
   	collapse: true,
@@ -402,7 +399,7 @@
   			unknown: "[Unknown]",
   			"null": "null",
   			"undefined": "undefined",
-  			"function": function _function(fn) {
+  			"function": function (fn) {
   				var ret = "function",
   				// Functions never have name in IE
   				name = "name" in fn ? fn.name : (reName.exec(fn) || [])[1];
@@ -687,7 +684,6 @@
   	var moduleFns = {
   		before: setHookFunction(module, "before"),
   		beforeEach: setHookFunction(module, "beforeEach"),
-  		afterEach: setHookFunction(module, "afterEach"),
   		after: setHookFunction(module, "after")
   	};
 
@@ -907,7 +903,7 @@
         sealed = true;
 
         reject(promise, reason);
-      }, 'Settle: ' + (promise._label || ' unknown promise'));
+      }, 'Settle: unknown promise'));
 
       if (!sealed && error) {
         sealed = true;
@@ -1160,7 +1156,6 @@
   Promise$2.all = all;
   Promise$2.resolve = resolve$1;
   Promise$2.reject = reject$1;
-  Promise$2._setAsap = setAsap;
 
   Promise$2.Promise = Promise$2;
 
@@ -2269,13 +2264,6 @@
   	// For CommonJS with exports, but without module.exports, like Rhino
   	if (typeof exports !== "undefined" && exports) {
   		exports.QUnit = QUnit;
-  	}
-
-  	if (typeof define === "function" && define.amd) {
-  		define(function () {
-  			return QUnit;
-  		});
-  		QUnit.config.autostart = false;
   	}
 
   	// For Web/Service Workers
