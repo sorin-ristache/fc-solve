@@ -926,15 +926,6 @@
     };
   }
 
-  // web worker
-  function useMessageChannel() {
-    var channel = new MessageChannel();
-    channel.port1.onmessage = flush;
-    return function () {
-      return channel.port2.postMessage(0);
-    };
-  }
-
   function useSetTimeout() {
     // Store setTimeout reference so es6-promise will be unaffected by
     // other code modifying setTimeout (like sinon.useFakeTimers())
@@ -959,29 +950,9 @@
     len = 0;
   }
 
-  function attemptVertx() {
-    try {
-      var vertx = Function('return this')().require('vertx');
-      vertxNext = vertx.runOnLoop || vertx.runOnContext;
-      return useVertxTimer();
-    } catch (e) {
-      return useSetTimeout();
-    }
-  }
-
-  var scheduleFlush = void 0;
+  let scheduleFlush = void 0;
   // Decide what async method to use to triggering processing of queued callbacks:
-  if (isNode) {
     scheduleFlush = useNextTick();
-  } else if (BrowserMutationObserver) {
-    scheduleFlush = useMutationObserver();
-  } else if (isWorker) {
-    scheduleFlush = useMessageChannel();
-  } else if (browserWindow === undefined && typeof require === 'function') {
-    scheduleFlush = attemptVertx();
-  } else {
-    scheduleFlush = useSetTimeout();
-  }
 
   function then(onFulfillment, onRejection) {
     var parent = this;
@@ -1007,37 +978,6 @@
     return child;
   }
 
-  /**
-    `Promise.resolve` returns a promise that will become resolved with the
-    passed `value`. It is shorthand for the following:
-
-    ```javascript
-    let promise = new Promise(function(resolve, reject){
-      resolve(1);
-    });
-
-    promise.then(function(value){
-      // value === 1
-    });
-    ```
-
-    Instead of writing the above, your code now simply becomes the following:
-
-    ```javascript
-    let promise = Promise.resolve(1);
-
-    promise.then(function(value){
-      // value === 1
-    });
-    ```
-
-    @method resolve
-    @static
-    @param {Any} value value that the returned promise will be resolved with
-    Useful for tooling.
-    @return {Promise} a promise that will become fulfilled with the given
-    `value`
-  */
   function resolve$1(object) {
     /*jshint validthis:true */
     var Constructor = this;
@@ -2103,12 +2043,6 @@
   				_this2.preserveEnvironment = true;
   			}
 
-  			// The 'after' hook should only execute when there are not tests left and
-  			// when the 'after' and 'finish' tasks are the only tasks left to process
-  			if (hookName === "after" && hookOwner.unskippedTestsRun !== numberOfUnskippedTests(hookOwner) - 1 && (config.queue.length > 0 || ProcessingQueue.taskCount() > 2)) {
-  				return;
-  			}
-
   			config.current = _this2;
   			if (config.notrycatch) {
   				callHook();
@@ -2622,12 +2556,6 @@
 
   function numberOfTests(module) {
   	return collectTests(module).length;
-  }
-
-  function numberOfUnskippedTests(module) {
-  	return collectTests(module).filter(function (test) {
-  		return !test.skip;
-  	}).length;
   }
 
   function notifyTestsRan(module, skipped) {
