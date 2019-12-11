@@ -50,7 +50,6 @@
       for (var i = 0; i < props.length; i++) {
         var descriptor = props[i];
         descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
         if ("value" in descriptor) descriptor.writable = true;
         Object.defineProperty(target, descriptor.key, descriptor);
       }
@@ -203,10 +202,6 @@
   	// very useful in combination with "Hide passed tests" checked
   	reorder: true,
 
-  	// HTML Reporter: collapse every test except the first failing test
-  	// If false, all failing tests will be expanded
-  	collapse: true,
-
   	// By default, scroll to top of the page when suite is done
   	scrolltop: true,
 
@@ -230,8 +225,6 @@
   		testsRun: 0,
   		unskippedTestsRun: 0,
   	},
-
-  	callbacks: {},
 
   	// The storage module to use for reordering tests
   	storage: localSessionStorage
@@ -691,7 +684,7 @@
    * @param {Object} data
    * @return {Void}
    */
-  function emit(eventName, data) {
+  function emit(eventName, ) {
   	if (objectType(eventName) !== "string") {
   		throw new TypeError("eventName must be a string when emitting an event");
   	}
@@ -738,9 +731,6 @@
     queue[len + 1] = arg;
     len += 2;
     if (len === 2) {
-      // If len is 2, that means that we need to schedule an async flush.
-      // If additional callbacks are queued before the queue is flushed, they
-      // will be processed by this flush that we are scheduling.
       if (customSchedulerFn) {
         customSchedulerFn(flush);
       } else {
@@ -753,8 +743,6 @@
     asap = asapFn;
   }
 
-  const browserWindow = typeof window !== 'undefined' ? window : undefined;
-  const browserGlobal = browserWindow || {};
   const isNode = typeof self === 'undefined' && typeof process !== 'undefined' && {}.toString.call(process) === '[object process]';
 
   // test for web worker but not in IE10
@@ -785,7 +773,6 @@
   }
 
   let scheduleFlush = void 0;
-  // Decide what async method to use to triggering processing of queued callbacks:
     scheduleFlush = useNextTick();
 
   function then(onFulfillment, onRejection) {
@@ -1547,7 +1534,6 @@
   		var module = this.module,
   		    notStartedModules = getNotStartedModules(module);
 
-  		// ensure the callbacks are executed serially for each module
   		var callbackPromises = notStartedModules.reduce(function (promiseChain, startModule) {
   			return promiseChain.then(function () {
   				startModule.stats = { all: 0, bad: 0, started: now() };
@@ -1577,8 +1563,6 @@
   		var promise;
 
   		config.current = this;
-
-  		this.callbackStarted = now();
 
   		if (config.notrycatch) {
   			runTest(this);
@@ -1667,8 +1651,6 @@
   			}
   		}
 
-  		// After emitting the js-reporters event we cleanup the assertion data to
-  		// avoid leaking it. It is not used by the legacy testDone callbacks.
   		emit("testEnd", this.testReport.end(true));
   		this.testReport.slimAssertions();
   		var test = this;
