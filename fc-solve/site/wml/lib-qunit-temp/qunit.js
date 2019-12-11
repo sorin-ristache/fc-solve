@@ -2822,55 +2822,6 @@
 
   (function () {
 
-  	if (typeof window$1 === "undefined" || typeof document$1 === "undefined") {
-  		return;
-  	}
-
-  	var config = QUnit.config,
-  	    hasOwn = Object.prototype.hasOwnProperty;
-
-  	// Stores fixture HTML for resetting later
-  	function storeFixture() {
-
-  		// Avoid overwriting user-defined values
-  		if (hasOwn.call(config, "fixture")) {
-  			return;
-  		}
-
-  		var fixture = document$1.getElementById("qunit-fixture");
-  		if (fixture) {
-  			config.fixture = fixture.cloneNode(true);
-  		}
-  	}
-
-  	QUnit.begin(storeFixture);
-
-  	// Resets the fixture DOM element if available.
-  	function resetFixture() {
-  		if (config.fixture == null) {
-  			return;
-  		}
-
-  		var fixture = document$1.getElementById("qunit-fixture");
-  		var resetFixtureType = _typeof(config.fixture);
-  		if (resetFixtureType === "string") {
-
-  			// support user defined values for `config.fixture`
-  			var newFixture = document$1.createElement("div");
-  			newFixture.setAttribute("id", "qunit-fixture");
-  			newFixture.innerHTML = config.fixture;
-  			fixture.parentNode.replaceChild(newFixture, fixture);
-  		} else {
-  			var clonedFixture = config.fixture.cloneNode(true);
-  			fixture.parentNode.replaceChild(clonedFixture, fixture);
-  		}
-  	}
-
-  	QUnit.testStart(resetFixture);
-  })();
-
-  (function () {
-
   	// Only interact with URLs via window.location
   	var location = typeof window$1 !== "undefined" && window$1.location;
   	if (!location) {
@@ -3018,26 +2969,6 @@
   		return document.getElementById && document.getElementById(name);
   	}
 
-  	function abortTests() {
-  		var abortButton = id("qunit-abort-tests-button");
-  		if (abortButton) {
-  			abortButton.disabled = true;
-  			abortButton.innerHTML = "Aborting...";
-  		}
-  		QUnit.config.queue.length = 0;
-  		return false;
-  	}
-
-  	function interceptNavigation(ev) {
-  		applyUrlParams();
-
-  		if (ev && ev.preventDefault) {
-  			ev.preventDefault();
-  		}
-
-  		return false;
-  	}
-
   	function setUrl(params) {
   		var key,
   		    arrValue,
@@ -3065,36 +2996,6 @@
   			}
   		}
   		return location.protocol + "//" + location.host + location.pathname + querystring.slice(0, -1);
-  	}
-
-  	function applyUrlParams() {
-  		var i,
-  		    selectedModules = [],
-  		    modulesList = id("qunit-modulefilter-dropdown-list").getElementsByTagName("input"),
-  		    filter = id("qunit-filter-input").value;
-
-  		for (i = 0; i < modulesList.length; i++) {
-  			if (modulesList[i].checked) {
-  				selectedModules.push(modulesList[i].value);
-  			}
-  		}
-
-  		window$1.location = setUrl({
-  			filter: filter === "" ? undefined : filter,
-  			moduleId: selectedModules.length === 0 ? undefined : selectedModules,
-
-  			// Remove module and testId filter
-  			module: undefined,
-  			testId: undefined
-  		});
-  	}
-
-  	function abortTestsButton() {
-  		var button = document.createElement("button");
-  		button.id = "qunit-abort-tests-button";
-  		button.innerHTML = "Abort";
-  		addEvent(button, "click", abortTests);
-  		return button;
   	}
 
   	// HTML Reporter initialization and load
