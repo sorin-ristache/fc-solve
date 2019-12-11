@@ -2953,13 +2953,7 @@
   			_this.testEnvironment = extend({}, module.testEnvironment);
 
   			_this.started = now();
-  			emit("testStart", _this.testReport.start(true));
-  			return runLoggingCallbacks("testStart", {
-  				name: _this.testName,
-  				module: module.name,
-  				testId: _this.testId,
-  				previousFailure: _this.previousFailure
-  			}).then(function () {
+  			return 1;).then(function () {
   				if (!config.pollution) {
   					saveGlobal();
   				}
@@ -5195,22 +5189,6 @@
 
   		return ["<br />", completed, " / ", total, " tests completed in ", runtime, " milliseconds, with ", stats.failedTests, " failed, ", stats.skippedTests, " skipped, and ", stats.todoTests, " todo."].join("");
   	}
-
-  	QUnit.testStart(function (details) {
-  		var running, bad;
-
-  		appendTest(details.name, details.testId, details.module);
-
-  		running = id("qunit-testresult-display");
-
-  		if (running) {
-  			addClass(running, "running");
-
-  			bad = QUnit.config.reorder && details.previousFailure;
-
-  			running.innerHTML = [bad ? "Rerunning previously failed test: <br />" : "Running: <br />", getNameHtml(details.name, details.module), getProgressHtml(now() - config.started, stats, Test.count)].join("");
-  		}
-  	});
 
   	QUnit.log(function (details) {
   		var assertList,
