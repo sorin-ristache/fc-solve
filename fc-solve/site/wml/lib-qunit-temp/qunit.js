@@ -2784,8 +2784,6 @@
   			}
   		}
 
-  		this.logAssertion(details);
-
   		this.assertions.push({
   			result: !!resultInfo.result,
   			message: resultInfo.message
@@ -2804,28 +2802,6 @@
   			source: source
   		});
   	},
-
-  	/**
-    * Log assertion details using both the old QUnit.log interface and
-    * QUnit.on( "assertion" ) interface.
-    *
-    * @private
-    */
-  	logAssertion: function logAssertion(details) {
-  		runLoggingCallbacks("log", details);
-
-  		var assertion = {
-  			passed: details.result,
-  			actual: details.actual,
-  			expected: details.expected,
-  			message: details.message,
-  			stack: details.source,
-  			todo: details.todo
-  		};
-  		this.testReport.pushAssertion(assertion);
-  		emit("assertion", assertion);
-  	},
-
 
   	resolvePromise: function resolvePromise(promise, phase) {
   		var then,
