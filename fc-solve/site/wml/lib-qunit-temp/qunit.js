@@ -33,24 +33,6 @@
   	}
   }();
 
-  /**
-   * Returns a function that proxies to the given method name on the globals
-   * console object. The proxy will also detect if the console doesn't exist and
-   * will appropriately no-op. This allows support for IE9, which doesn't have a
-   * console if the developer tools are not open.
-   */
-  function consoleProxy(method) {
-  	return function () {
-  		if (console) {
-  			console[method].apply(console, arguments);
-  		}
-  	};
-  }
-
-  var Logger = {
-  	warn: consoleProxy("warn")
-  };
-
   var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
     return typeof obj;
   } : function (obj) {
@@ -118,7 +100,6 @@
   	try {
   		performance.measure(comment, startMark, endMark);
   	} catch (ex) {
-  		Logger.warn("performance.measure could not be executed because of ", ex.message);
   	}
   }
 
@@ -137,26 +118,6 @@
    */
   function inArray(elem, array) {
   	return array.indexOf(elem) !== -1;
-  }
-
-  /**
-   * Makes a clone of an object using only Array or Object as base,
-   * and copies over the own enumerable properties.
-   *
-   * @param {Object} obj
-   * @return {Object} New object with only the own properties (recursively).
-   */
-  function objectValues(obj) {
-  	var key,
-  	    val,
-  	    vals = is("array", obj) ? [] : {};
-  	for (key in obj) {
-  		if (hasOwn.call(obj, key)) {
-  			val = obj[key];
-  			vals[key] = val === Object(val) ? objectValues(val) : val;
-  		}
-  	}
-  	return vals;
   }
 
   function extend(a, b, undefOnly) {
@@ -2844,7 +2805,6 @@
   	}, {
   		key: "push",
   		value: function push(result, actual, expected, message, negative) {
-  			Logger.warn("assert.push is deprecated and will be removed in QUnit 3.0." + " Please use assert.pushResult instead (https://api.qunitjs.com/assert/pushResult).");
 
   			var currentAssert = this instanceof Assert ? this : config.current.assert;
   			return currentAssert.pushResult({
