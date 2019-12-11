@@ -1910,18 +1910,6 @@
   	hooks: function hooks(handler) {
   		var hooks = [];
 
-  		function processHooks(test, module) {
-  			if (module.parentModule) {
-  				processHooks(test, module.parentModule);
-  			}
-
-  		}
-
-  		// Hooks are ignored on skipped tests
-  		if (!this.skip) {
-  			processHooks(this, this.module);
-  		}
-
   		return hooks;
   	},
 
