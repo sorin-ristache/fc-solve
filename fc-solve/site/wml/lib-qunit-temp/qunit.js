@@ -3079,79 +3079,6 @@
   		return false;
   	}
 
-  	// Handle "click" events on toolbar checkboxes and "change" for select menus.
-  	// Updates the URL with the new state of `config.urlConfig` values.
-  	function toolbarChanged() {
-  		var updatedUrl,
-  		    value,
-  		    tests,
-  		    field = this,
-  		    params = {};
-
-  		// Detect if field is a select menu or a checkbox
-  		if ("selectedIndex" in field) {
-  			value = field.options[field.selectedIndex].value || undefined;
-  		} else {
-  			value = field.checked ? field.defaultValue || true : undefined;
-  		}
-
-  		params[field.name] = value;
-  		updatedUrl = setUrl(params);
-
-  		// Check if we can apply the change without a page refresh
-  		if ("hidepassed" === field.name && "replaceState" in window$1.history) {
-  			QUnit.urlParams[field.name] = value;
-  			config[field.name] = value || false;
-  			tests = id("qunit-tests");
-  			if (tests) {
-  				var length = tests.children.length;
-  				var children = tests.children;
-
-  				if (field.checked) {
-  					for (var i = 0; i < length; i++) {
-  						var test$$1 = children[i];
-
-  						if (test$$1 && test$$1.className.indexOf("pass") > -1) {
-  							hiddenTests.push(test$$1);
-  						}
-  					}
-
-  					var _iteratorNormalCompletion = true;
-  					var _didIteratorError = false;
-  					var _iteratorError = undefined;
-
-  					try {
-  						for (var _iterator = hiddenTests[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-  							var hiddenTest = _step.value;
-
-  							tests.removeChild(hiddenTest);
-  						}
-  					} catch (err) {
-  						_didIteratorError = true;
-  						_iteratorError = err;
-  					} finally {
-  						try {
-  							if (!_iteratorNormalCompletion && _iterator.return) {
-  								_iterator.return();
-  							}
-  						} finally {
-  							if (_didIteratorError) {
-  								throw _iteratorError;
-  							}
-  						}
-  					}
-  				} else {
-  					while ((test$$1 = hiddenTests.pop()) != null) {
-  						tests.appendChild(test$$1);
-  					}
-  				}
-  			}
-  			window$1.history.replaceState(null, "", updatedUrl);
-  		} else {
-  			window$1.location = updatedUrl;
-  		}
-  	}
-
   	function setUrl(params) {
   		var key,
   		    arrValue,
@@ -3207,9 +3134,6 @@
   		var urlConfigContainer = document.createElement("span");
 
   		addClass(urlConfigContainer, "qunit-url-config");
-
-  		addEvents(urlConfigContainer.getElementsByTagName("input"), "change", toolbarChanged);
-  		addEvents(urlConfigContainer.getElementsByTagName("select"), "change", toolbarChanged);
 
   		return urlConfigContainer;
   	}
