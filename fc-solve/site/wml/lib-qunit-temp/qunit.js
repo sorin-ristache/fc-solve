@@ -80,7 +80,6 @@
 
   var hasPerformanceApi = false;
   var performance = hasPerformanceApi ? window$1.performance : undefined;
-  var performanceNow = hasPerformanceApi ? performance.now.bind(performance) : now;
 
   function measure(comment, startMark, endMark) {
 
@@ -505,7 +504,7 @@
   		key: "start",
   		value: function start(recordTime) {
   			if (recordTime) {
-  				this._startTime = performanceNow();
+  				this._startTime = now();
 
   				if (performance) {
   					var suiteLevel = this.fullName.length;
@@ -531,7 +530,7 @@
   		key: "end",
   		value: function end(recordTime) {
   			if (recordTime) {
-  				this._endTime = performanceNow();
+  				this._endTime = now();
 
   				if (performance) {
   					var suiteLevel = this.fullName.length;
@@ -1353,7 +1352,7 @@
   		key: "start",
   		value: function start(recordTime) {
   			if (recordTime) {
-  				this._startTime = performanceNow();
+  				this._startTime = now();
   				if (performance) {
   					performance.mark("qunit_test_start");
   				}
@@ -1369,7 +1368,7 @@
   		key: "end",
   		value: function end(recordTime) {
   			if (recordTime) {
-  				this._endTime = performanceNow();
+  				this._endTime = now();
   				if (performance) {
   					performance.mark("qunit_test_end");
 
@@ -1491,7 +1490,6 @@
 
   		// Skipped tests will fully ignore any sent callback
   		this.callback = function () {};
-  		this.async = false;
   		this.expected = 0;
   	} else {
   		if (typeof this.callback !== "function") {
