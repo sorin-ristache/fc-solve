@@ -721,8 +721,6 @@
     asap = asapFn;
   }
 
-  const isNode = true;
-
   // node
   function useNextTick() {
     // node version 0.10.x displays a deprecation warning when nextTick is used recursively
@@ -1361,11 +1359,6 @@
   			});
   		}
   	}, {
-  		key: "pushAssertion",
-  		value: function pushAssertion(assertion) {
-  			this.assertions.push(assertion);
-  		}
-  	}, {
   		key: "getRuntime",
   		value: function getRuntime() {
   			return this._endTime - this._startTime;
@@ -1683,13 +1676,6 @@
   		}
   	},
 
-  	preserveTestEnvironment: function preserveTestEnvironment() {
-  		if (this.preserveEnvironment) {
-  			this.module.testEnvironment = this.testEnvironment;
-  			this.testEnvironment = extend({}, this.module.testEnvironment);
-  		}
-  	},
-
   	queue: function queue() {
   		var test = this;
 
@@ -1709,8 +1695,6 @@
 
   		// Prioritize previously failed tests, detected from storage
   		var prioritize = config.reorder && !!previousFailCount;
-
-  		this.previousFailure = !!previousFailCount;
 
   		ProcessingQueue.add(runTest, prioritize, config.seed);
 
@@ -2354,7 +2338,6 @@
   exportQUnit(QUnit);
 
   var stats = {
-  	passedTests: 0,
   	skippedTests: 0,
   	todoTests: 0
   };
