@@ -403,7 +403,6 @@
   				return join(ret, dump.parse(fn, "functionCode"), "}");
   			},
   			array: array,
-  			nodelist: array,
   			"arguments": array,
   			object: function object(map, stack) {
   				var keys,
@@ -448,12 +447,8 @@
   			// Object calls it internally, the key part of an item in a map
   			key: quote,
 
-  			// Function calls it internally, it's the content of the function
-  			functionCode: "[code]",
-
   			string: quote,
   			regexp: literal,
-  			number: literal,
   			"boolean": literal,
   			symbol: function symbol(sym) {
   				return sym.toString();
@@ -726,10 +721,7 @@
     asap = asapFn;
   }
 
-  const isNode = typeof self === 'undefined' && typeof process !== 'undefined' && {}.toString.call(process) === '[object process]';
-
-  // test for web worker but not in IE10
-  const isWorker = false;
+  const isNode = true;
 
   // node
   function useNextTick() {
@@ -1891,19 +1883,6 @@
 
   function saveGlobal() {
   	config.pollution = [];
-
-  	if (config.noglobals) {
-  		for (var key in global$1) {
-  			if (hasOwn.call(global$1, key)) {
-
-  				// In Opera sometimes DOM element ids show up here, ignore them
-  				if (/^qunit-test-output/.test(key)) {
-  					continue;
-  				}
-  				config.pollution.push(key);
-  			}
-  		}
-  	}
   }
 
   // Will be exposed as QUnit.test
@@ -2188,9 +2167,6 @@
   	}
 
   	if (config.current) {
-  		if (config.current.ignoreGlobalErrors) {
-  			return true;
-  		}
   		pushFailure.apply(undefined, [error.message, error.stacktrace || error.fileName + ":" + error.lineNumber].concat(args));
   	} else {
   		test("global failure", extend(function () {
@@ -2230,9 +2206,6 @@
 
   var globalStartCalled = false;
   var runStarted = false;
-
-  // Figure out if we're running the tests from a server or not
-  QUnit.isLocal = !(defined.document && window$1.location.protocol !== "file:");
 
   // Expose the current QUnit version
   QUnit.version = "2.9.3";
