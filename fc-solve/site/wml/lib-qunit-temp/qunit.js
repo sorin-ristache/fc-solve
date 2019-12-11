@@ -887,13 +887,13 @@
     asap = asapFn;
   }
 
-  var browserWindow = typeof window !== 'undefined' ? window : undefined;
-  var browserGlobal = browserWindow || {};
-  var BrowserMutationObserver = browserGlobal.MutationObserver || browserGlobal.WebKitMutationObserver;
-  var isNode = typeof self === 'undefined' && typeof process !== 'undefined' && {}.toString.call(process) === '[object process]';
+  const browserWindow = typeof window !== 'undefined' ? window : undefined;
+  const browserGlobal = browserWindow || {};
+  const BrowserMutationObserver = browserGlobal.MutationObserver || browserGlobal.WebKitMutationObserver;
+  const isNode = typeof self === 'undefined' && typeof process !== 'undefined' && {}.toString.call(process) === '[object process]';
 
   // test for web worker but not in IE10
-  var isWorker = typeof Uint8ClampedArray !== 'undefined' && typeof importScripts !== 'undefined' && typeof MessageChannel !== 'undefined';
+  const isWorker = typeof Uint8ClampedArray !== 'undefined' && typeof importScripts !== 'undefined' && typeof MessageChannel !== 'undefined';
 
   // node
   function useNextTick() {
@@ -901,37 +901,6 @@
     // see https://github.com/cujojs/when/issues/410 for details
     return function () {
       return process.nextTick(flush);
-    };
-  }
-
-  // vertx
-  function useVertxTimer() {
-    if (typeof vertxNext !== 'undefined') {
-      return function () {
-        vertxNext(flush);
-      };
-    }
-
-    return useSetTimeout();
-  }
-
-  function useMutationObserver() {
-    var iterations = 0;
-    var observer = new BrowserMutationObserver(flush);
-    var node = document.createTextNode('');
-    observer.observe(node, { characterData: true });
-
-    return function () {
-      node.data = iterations = ++iterations % 2;
-    };
-  }
-
-  function useSetTimeout() {
-    // Store setTimeout reference so es6-promise will be unaffected by
-    // other code modifying setTimeout (like sinon.useFakeTimers())
-    var globalSetTimeout = setTimeout;
-    return function () {
-      return globalSetTimeout(flush, 1);
     };
   }
 
