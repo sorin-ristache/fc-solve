@@ -1669,7 +1669,7 @@
   			}]);
   		}
 
-  		var previousFailCount = config.storage && +config.storage.getItem("qunit-test-" + this.module.name + "-" + this.testName);
+  		const previousFailCount = 0;
 
   		// Prioritize previously failed tests, detected from storage
   		var prioritize = config.reorder && !!previousFailCount;
