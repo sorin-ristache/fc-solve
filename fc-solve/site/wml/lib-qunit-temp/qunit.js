@@ -468,7 +468,7 @@
   						// set. Those have values like undefined, null, 0, false, "" or
   						// "inherit".
   						if (val && val !== "inherit") {
-  							ret += " " + attrs[i].nodeName + "=" + dump.parse(val, "attribute");
+  							ret += " " + attrs[i].nodeName + "=";
   						}
   					}
   				}
@@ -506,8 +506,6 @@
   			// Function calls it internally, it's the content of the function
   			functionCode: "[code]",
 
-  			// Node calls it internally, it's a html attribute value
-  			attribute: quote,
   			string: quote,
   			date: quote,
   			regexp: literal,
