@@ -91,46 +91,6 @@
     };
   }();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   var toConsumableArray = function (arr) {
     if (Array.isArray(arr)) {
       for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
@@ -147,13 +107,9 @@
   	return new Date().getTime();
   };
 
-  var hasPerformanceApi = detectPerformanceApi();
+  var hasPerformanceApi = false;
   var performance = hasPerformanceApi ? window$1.performance : undefined;
   var performanceNow = hasPerformanceApi ? performance.now.bind(performance) : now;
-
-  function detectPerformanceApi() {
-  	return window$1 && typeof window$1.performance !== "undefined" && typeof window$1.performance.mark === "function" && typeof window$1.performance.measure === "function";
-  }
 
   function measure(comment, startMark, endMark) {
 
