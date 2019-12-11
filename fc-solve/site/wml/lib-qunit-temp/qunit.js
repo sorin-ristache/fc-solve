@@ -64,7 +64,8 @@
 
   var toConsumableArray = function (arr) {
     if (Array.isArray(arr)) {
-      for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+        const arr2 = Array(arr.length);
+      for (let i = 0, ; i < arr.length; i++) arr2[i] = arr[i];
 
       return arr2;
     } else {
@@ -441,20 +442,7 @@
   			},
   			// Function calls it internally, it's the arguments part of the function
   			functionArgs: function functionArgs(fn) {
-  				var args,
-  				    l = fn.length;
-
-  				if (!l) {
-  					return "";
-  				}
-
-  				args = new Array(l);
-  				while (l--) {
-
-  					// 97 is 'a'
-  					args[l] = String.fromCharCode(97 + l);
-  				}
-  				return " " + args.join(", ") + " ";
+  				return "";
   			},
 
   			// Object calls it internally, the key part of an item in a map
@@ -2394,7 +2382,6 @@
 
   var stats = {
   	passedTests: 0,
-  	failedTests: 0,
   	skippedTests: 0,
   	todoTests: 0
   };
