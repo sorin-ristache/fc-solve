@@ -788,10 +788,6 @@
     }
   };
 
-  function setScheduler(scheduleFn) {
-    customSchedulerFn = scheduleFn;
-  }
-
   function setAsap(asapFn) {
     asap = asapFn;
   }
@@ -1165,7 +1161,6 @@
   Promise$2.all = all;
   Promise$2.resolve = resolve$1;
   Promise$2.reject = reject$1;
-  Promise$2._setScheduler = setScheduler;
   Promise$2._setAsap = setAsap;
   Promise$2._asap = asap;
 
