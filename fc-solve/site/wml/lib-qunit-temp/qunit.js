@@ -712,28 +712,7 @@
   				return suite.getTestCounts(counts);
   			}, counts);
   		}
-  	}, {
-  		key: "getStatus",
-  		value: function getStatus() {
-  			var _getTestCounts = this.getTestCounts(),
-  			    total = _getTestCounts.total,
-  			    failed = _getTestCounts.failed,
-  			    skipped = _getTestCounts.skipped,
-  			    todo = _getTestCounts.todo;
-
-  			if (failed) {
-  				return "failed";
-  			} else {
-  				if (skipped === total) {
-  					return "skipped";
-  				} else if (todo === total) {
-  					return "todo";
-  				} else {
-  					return "passed";
-  				}
-  			}
-  		}
-  	}]);
+  	}, ]);
   	return SuiteReport;
   }();
 
