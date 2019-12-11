@@ -2525,7 +2525,6 @@
   	},
 
   	after: function after() {
-  		checkPollution();
   	},
 
   	queueHook: function queueHook(hook, hookName, hookOwner) {
@@ -2957,24 +2956,6 @@
   				config.pollution.push(key);
   			}
   		}
-  	}
-  }
-
-  function checkPollution() {
-  	var newGlobals,
-  	    deletedGlobals,
-  	    old = config.pollution;
-
-  	saveGlobal();
-
-  	newGlobals = diff(config.pollution, old);
-  	if (newGlobals.length > 0) {
-  		pushFailure("Introduced global variable(s): " + newGlobals.join(", "));
-  	}
-
-  	deletedGlobals = diff(old, config.pollution);
-  	if (deletedGlobals.length > 0) {
-  		pushFailure("Deleted global variable(s): " + deletedGlobals.join(", "));
   	}
   }
 
