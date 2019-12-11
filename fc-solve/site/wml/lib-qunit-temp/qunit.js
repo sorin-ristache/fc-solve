@@ -2364,20 +2364,16 @@
 
   	resolvePromise: function resolvePromise(promise, phase) {
   		var then,
-  		    resume,
   		    message,
   		    test = this;
   		if (promise != null) {
   			then = promise.then;
   			if (objectType(then) === "function") {
-  				resume = internalStop(test);
   				if (config.notrycatch) {
   					then.call(promise, function () {
-  						resume();
   					});
   				} else {
   					then.call(promise, function () {
-  						resume();
   					}, function (error) {
   						message = "Promise rejected " + (!phase ? "during" : phase.replace(/Each$/, "")) + " \"" + test.testName + "\": " + (error && error.message || error);
   						test.pushFailure(message, extractStacktrace(error, 0));
@@ -2559,46 +2555,6 @@
   	config.timeout = setTimeout$1(config.timeoutHandler(timeoutDuration), timeoutDuration);
   }
 
-  // Put a hold on processing and return a function that will release it.
-  function internalStop(test) {
-  	var released = false;
-  	test.semaphore += 1;
-  	config.blocking = true;
-
-  	// Set a recovery timeout, if so configured.
-  	if (defined.setTimeout) {
-  		var timeoutDuration = void 0;
-
-  		if (typeof test.timeout === "number") {
-  			timeoutDuration = test.timeout;
-  		} else if (typeof config.testTimeout === "number") {
-  			timeoutDuration = config.testTimeout;
-  		}
-
-  		if (typeof timeoutDuration === "number" && timeoutDuration > 0) {
-  			clearTimeout(config.timeout);
-  			config.timeoutHandler = function (timeout) {
-  				return function () {
-  					pushFailure("Test took longer than " + timeout + "ms; test timed out.", sourceFromStacktrace(2));
-  					released = true;
-  					internalRecover(test);
-  				};
-  			};
-  			config.timeout = setTimeout$1(config.timeoutHandler(timeoutDuration), timeoutDuration);
-  		}
-  	}
-
-  	return function resume() {
-  		if (released) {
-  			return;
-  		}
-
-  		released = true;
-  		test.semaphore -= 1;
-  		internalStart(test);
-  	};
-  }
-
   // Forcefully release all processing holds.
   function internalRecover(test) {
   	test.semaphore = 0;
@@ -2777,8 +2733,6 @@
   				acceptCallCount = 1;
   			}
 
-  			var resume = internalStop(test$$1);
-
   			return function done() {
   				if (config.current !== test$$1) {
   					throw Error("assert.async callback called after test finished.");
@@ -2795,7 +2749,6 @@
   				}
 
   				popped = true;
-  				resume();
   			};
   		}
 
