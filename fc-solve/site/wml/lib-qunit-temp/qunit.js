@@ -39,16 +39,6 @@
     return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
   };
 
-
-
-
-
-
-
-
-
-
-
   var classCallCheck = function (instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
@@ -419,8 +409,6 @@
   			"undefined": "undefined",
   			"function": function _function(fn) {
   				var ret = "function",
-
-
   				// Functions never have name in IE
   				name = "name" in fn ? fn.name : (reName.exec(fn) || [])[1];
 
@@ -650,8 +638,6 @@
   	return SuiteReport;
   }();
 
-  var focused = false;
-
   var moduleStack = [];
 
   function createModule(name, testEnvironment, modifiers) {
@@ -743,39 +729,22 @@
   }
 
   function module$1(name, options, executeNow) {
-  	if (focused) {
-  		return;
-  	}
-
   	processModule(name, options, executeNow);
   }
 
   module$1.only = function () {
-  	if (focused) {
-  		return;
-  	}
-
   	config.modules.length = 0;
   	config.queue.length = 0;
 
   	module$1.apply(undefined, arguments);
 
-  	focused = true;
   };
 
   module$1.skip = function (name, options, executeNow) {
-  	if (focused) {
-  		return;
-  	}
-
   	processModule(name, options, executeNow, { skip: true });
   };
 
   module$1.todo = function (name, options, executeNow) {
-  	if (focused) {
-  		return;
-  	}
-
   	processModule(name, options, executeNow, { todo: true });
   };
 
@@ -845,8 +814,6 @@
   function isFunction(x) {
     return typeof x === 'function';
   }
-
-
 
   var _isArray = void 0;
   if (Array.isArray) {
@@ -933,7 +900,6 @@
     }
 
     var _state = parent._state;
-
 
     if (_state) {
       var callback = arguments[_state - 1];
@@ -1093,7 +1059,6 @@
     var _subscribers = parent._subscribers;
     var length = _subscribers.length;
 
-
     parent._onerror = null;
 
     _subscribers[length] = child;
@@ -1238,7 +1203,6 @@
         var c = this._instanceConstructor;
         var resolve$$1 = c.resolve;
 
-
         if (resolve$$1 === resolve$1) {
           var _then = void 0;
           var error = void 0;
@@ -1276,7 +1240,6 @@
       key: '_settledAt',
       value: function _settledAt(state, i, value) {
         var promise = this.promise;
-
 
         if (promise._state === PENDING) {
           this._remaining--;
@@ -1827,8 +1790,6 @@
   	return TestReport;
   }();
 
-  var focused$1 = false;
-
   function Test(settings) {
   	var i, l;
 
@@ -1842,13 +1803,6 @@
   	this.timeout = undefined;
   	this.errorForStack = new Error();
 
-  	// If a module is skipped, all its tests and the tests of the child suites
-  	// should be treated as skipped even if they are defined as `only` or `todo`.
-  	// As for `todo` module, all its tests will be treated as `todo` except for
-  	// tests defined as `skip` which will be left intact.
-  	//
-  	// So, if a test is defined as `todo` and is inside a skipped module, we should
-  	// then treat that test as if was defined as `skip`.
   	if (this.module.skip) {
   		settings.skip = true;
   		settings.todo = false;
@@ -2027,7 +1981,6 @@
   		return runHook;
   	},
 
-
   	// Currently only used for module level hooks, can be used to add global level ones
   	hooks: function hooks(handler) {
   		var hooks = [];
@@ -2051,7 +2004,6 @@
 
   		return hooks;
   	},
-
 
   	finish: function finish() {
   		config.current = this;
@@ -2213,7 +2165,6 @@
   			ProcessingQueue.advance();
   		}
   	},
-
 
   	pushResult: function pushResult(resultInfo) {
   		if (this !== config.current) {
@@ -2395,10 +2346,6 @@
 
   // Will be exposed as QUnit.test
   function test(testName, callback) {
-  	if (focused$1) {
-  		return;
-  	}
-
   	var newTest = new Test({
   		testName: testName,
   		callback: callback
@@ -2408,10 +2355,6 @@
   }
 
   function todo(testName, callback) {
-  	if (focused$1) {
-  		return;
-  	}
-
   	var newTest = new Test({
   		testName: testName,
   		callback: callback,
@@ -2423,10 +2366,6 @@
 
   // Will be exposed as QUnit.skip
   function skip(testName) {
-  	if (focused$1) {
-  		return;
-  	}
-
   	var test = new Test({
   		testName: testName,
   		skip: true
@@ -2437,12 +2376,7 @@
 
   // Will be exposed as QUnit.only
   function only(testName, callback) {
-  	if (focused$1) {
-  		return;
-  	}
-
   	config.queue.length = 0;
-  	focused$1 = true;
 
   	var newTest = new Test({
   		testName: testName,
