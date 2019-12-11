@@ -3862,33 +3862,6 @@
   			});
   		}
   	}, {
-  		key: "propEqual",
-  		value: function propEqual(actual, expected, message) {
-  			actual = objectValues(actual);
-  			expected = objectValues(expected);
-
-  			this.pushResult({
-  				result: equiv(actual, expected),
-  				actual: actual,
-  				expected: expected,
-  				message: message
-  			});
-  		}
-  	}, {
-  		key: "notPropEqual",
-  		value: function notPropEqual(actual, expected, message) {
-  			actual = objectValues(actual);
-  			expected = objectValues(expected);
-
-  			this.pushResult({
-  				result: !equiv(actual, expected),
-  				actual: actual,
-  				expected: expected,
-  				message: message,
-  				negative: true
-  			});
-  		}
-  	}, {
   		key: "deepEqual",
   		value: function deepEqual(actual, expected, message) {
   			this.pushResult({
@@ -5463,11 +5436,6 @@
   	} else {
   		addEvent(window$1, "load", QUnit.load);
   	}
-
-  	// Wrap window.onerror. We will call the original window.onerror to see if
-  	// the existing handler fully handles the error; if not, we will call the
-  	// QUnit.onError function.
-  	var originalWindowOnError = window$1.onerror;
 
   })();
 
