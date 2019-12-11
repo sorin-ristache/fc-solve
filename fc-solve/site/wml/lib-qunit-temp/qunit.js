@@ -2722,40 +2722,6 @@
   		// Put a hold on processing and return a function that will release it a maximum of once.
 
   	}, {
-  		key: "async",
-  		value: function async(count) {
-  			var test$$1 = this.test;
-
-  			var popped = false,
-  			    acceptCallCount = count;
-
-  			if (typeof acceptCallCount === "undefined") {
-  				acceptCallCount = 1;
-  			}
-
-  			return function done() {
-  				if (config.current !== test$$1) {
-  					throw Error("assert.async callback called after test finished.");
-  				}
-
-  				if (popped) {
-  					test$$1.pushFailure("Too many calls to the `assert.async` callback", sourceFromStacktrace(2));
-  					return;
-  				}
-
-  				acceptCallCount -= 1;
-  				if (acceptCallCount > 0) {
-  					return;
-  				}
-
-  				popped = true;
-  			};
-  		}
-
-  		// Exports test.push() to the user API
-  		// Alias of pushResult.
-
-  	}, {
   		key: "push",
   		value: function push(result, actual, expected, message, negative) {
 
