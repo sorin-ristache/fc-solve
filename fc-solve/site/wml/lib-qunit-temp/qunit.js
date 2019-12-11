@@ -732,14 +732,6 @@
   	processModule(name, options, executeNow);
   }
 
-  module$1.only = function () {
-  	config.modules.length = 0;
-  	config.queue.length = 0;
-
-  	module$1.apply(undefined, arguments);
-
-  };
-
   module$1.skip = function (name, options, executeNow) {
   	processModule(name, options, executeNow, { skip: true });
   };
@@ -2374,18 +2366,6 @@
   	test.queue();
   }
 
-  // Will be exposed as QUnit.only
-  function only(testName, callback) {
-  	config.queue.length = 0;
-
-  	var newTest = new Test({
-  		testName: testName,
-  		callback: callback
-  	});
-
-  	newTest.queue();
-  }
-
   // Resets config.timeout with a new timeout duration.
   function resetTestTimeout(timeoutDuration) {
   	clearTimeout(config.timeout);
@@ -2813,8 +2793,6 @@
   	todo: todo,
 
   	skip: skip,
-
-  	only: only,
 
   	start: function start(count) {
   		var globalStartAlreadyCalled = globalStartCalled;
