@@ -2653,27 +2653,6 @@
   	// Assert helpers
 
   	createClass(Assert, [{
-  		key: "timeout",
-  		value: function timeout(duration) {
-  			if (typeof duration !== "number") {
-  				throw new Error("You must pass a number as the duration to assert.timeout");
-  			}
-
-  			this.test.timeout = duration;
-
-  			// If a timeout has been set, clear it and reset with the new duration
-  			if (config.timeout) {
-  				clearTimeout(config.timeout);
-
-  				if (config.timeoutHandler && this.test.timeout > 0) {
-  					resetTestTimeout(this.test.timeout);
-  				}
-  			}
-  		}
-
-  		// Documents a "step", which is a string value, in a test as a passing assertion
-
-  	}, {
   		key: "step",
   		value: function step(message) {
   			var assertionMessage = message;
@@ -2695,19 +2674,6 @@
   		}
 
   		// Verifies the steps in a test match a given array of string values
-
-  	}, {
-  		key: "verifySteps",
-  		value: function verifySteps(steps, message) {
-
-  			// Since the steps array is just string values, we can clone with slice
-  			var actualStepsClone = this.test.steps.slice();
-  			this.deepEqual(actualStepsClone, steps, message);
-  			this.test.steps.length = 0;
-  		}
-
-  		// Specify the number of expected assertions to guarantee that failed test
-  		// (no assertions are run at all) don't slip through.
 
   	}, {
   		key: "expect",
