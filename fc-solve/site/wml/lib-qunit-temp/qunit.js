@@ -794,11 +794,10 @@
 
   const browserWindow = typeof window !== 'undefined' ? window : undefined;
   const browserGlobal = browserWindow || {};
-  const BrowserMutationObserver = browserGlobal.MutationObserver || browserGlobal.WebKitMutationObserver;
   const isNode = typeof self === 'undefined' && typeof process !== 'undefined' && {}.toString.call(process) === '[object process]';
 
   // test for web worker but not in IE10
-  const isWorker = typeof Uint8ClampedArray !== 'undefined' && typeof importScripts !== 'undefined' && typeof MessageChannel !== 'undefined';
+  const isWorker = false;
 
   // node
   function useNextTick() {
@@ -1129,13 +1128,13 @@
 
     createClass(Promise, [{
       key: 'catch',
-      value: function _catch(onRejection) {
+      value: function (onRejection) {
         return this.then(null, onRejection);
       }
 
     }, {
       key: 'finally',
-      value: function _finally(callback) {
+      value: function (callback) {
         var promise = this;
         var constructor = promise.constructor;
 
@@ -1162,7 +1161,6 @@
   Promise$2.resolve = resolve$1;
   Promise$2.reject = reject$1;
   Promise$2._setAsap = setAsap;
-  Promise$2._asap = asap;
 
   Promise$2.Promise = Promise$2;
 
@@ -1246,10 +1244,6 @@
   	config.depth--;
   }
 
-  /**
-   * Process the first task on the taskQueue as a promise.
-   * Each task is a function returned by https://github.com/qunitjs/qunit/blob/master/src/test.js#L381
-   */
   function processTaskQueue(start) {
   	if (taskQueue.length && !config.blocking) {
   		var elapsedTime = now() - start;
