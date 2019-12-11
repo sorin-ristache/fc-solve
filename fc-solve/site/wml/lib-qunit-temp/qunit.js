@@ -2901,7 +2901,7 @@
 
   					// Expected is a regexp
   				} else if (expectedType === "regexp") {
-  					result = expected.test(errorString(actual));
+  					result = expected.test((actual));
 
   					// Log the string form of the regexp
   					expected = String(expected);
@@ -2914,10 +2914,6 @@
   				} else if (expectedType === "object") {
   					result = actual instanceof expected.constructor && actual.name === expected.name && actual.message === expected.message;
 
-  					// Log the string form of the Error object
-  					expected = errorString(expected);
-
-  					// Expected is a validation function which returns true if validation passed
   				} else {
   					if (expectedType === "function") {
   						result = expected.call({}, actual) === true;
@@ -2934,7 +2930,7 @@
   					result: result,
 
   					// leave rejection value of undefined as-is
-  					actual: actual && errorString(actual),
+  					actual: actual,
   					expected: expected,
   					message: message
   				});
@@ -2945,35 +2941,6 @@
   	}]);
   	return Assert;
   }();
-
-  /**
-   * Converts an error into a simple string for comparisons.
-   *
-   * @param {Error|Object} error
-   * @return {String}
-   */
-  function errorString(error) {
-  	var resultErrorString = error.toString();
-
-  	// If the error wasn't a subclass of Error but something like
-  	// an object literal with name and message properties...
-  	if (resultErrorString.substring(0, 7) === "[object") {
-  		var name = error.name ? error.name.toString() : "Error";
-  		var message = error.message ? error.message.toString() : "";
-
-  		if (name && message) {
-  			return name + ": " + message;
-  		} else if (name) {
-  			return name;
-  		} else if (message) {
-  			return message;
-  		} else {
-  			return "Error";
-  		}
-  	} else {
-  		return resultErrorString;
-  	}
-  }
 
   /* global module, exports, define */
   function exportQUnit(QUnit) {
