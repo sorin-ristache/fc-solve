@@ -3872,17 +3872,6 @@
   			});
   		}
   	}, {
-  		key: "notDeepEqual",
-  		value: function notDeepEqual(actual, expected, message) {
-  			this.pushResult({
-  				result: !equiv(actual, expected),
-  				actual: actual,
-  				expected: expected,
-  				message: message,
-  				negative: true
-  			});
-  		}
-  	}, {
   		key: "strictEqual",
   		value: function strictEqual(actual, expected, message) {
   			this.pushResult({
