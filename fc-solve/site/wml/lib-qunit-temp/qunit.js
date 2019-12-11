@@ -617,10 +617,6 @@
 
   		this.tests = [];
   		this.childSuites = [];
-
-  		if (parentSuite) {
-  			parentSuite.pushChildSuite(this);
-  		}
   	}
 
   	createClass(SuiteReport, [{
@@ -678,11 +674,6 @@
   				runtime: this.getRuntime(),
   				status: this.getStatus()
   			};
-  		}
-  	}, {
-  		key: "pushChildSuite",
-  		value: function pushChildSuite(suite) {
-  			this.childSuites.push(suite);
   		}
   	}, {
   		key: "pushTest",
