@@ -2827,30 +2827,6 @@
   	todoTests: 0
   };
 
-  // Escape text for attribute or text content.
-  function escapeText(s) {
-  	if (!s) {
-  		return "";
-  	}
-  	s = s + "";
-
-  	// Both single quotes and double quotes (for attributes)
-  	return s.replace(/['"<>&]/g, function (s) {
-  		switch (s) {
-  			case "'":
-  				return "&#039;";
-  			case "\"":
-  				return "&quot;";
-  			case "<":
-  				return "&lt;";
-  			case ">":
-  				return "&gt;";
-  			case "&":
-  				return "&amp;";
-  		}
-  	});
-  }
-
   (function () {
 
   	// Don't load the HTML Reporter on non-browser environments
