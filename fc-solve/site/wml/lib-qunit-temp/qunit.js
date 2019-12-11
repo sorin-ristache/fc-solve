@@ -305,7 +305,8 @@
   		);
   	}
 
-  	var reName = /^function (\w+)/,
+  	const reName = /^function (\w+)/;
+      let
   	    dump = {
 
   		// The objType is used mostly internally, you can fix a (custom) type in advance
@@ -2545,20 +2546,6 @@
   				result: !!result,
   				actual: result,
   				expected: true,
-  				message: message
-  			});
-  		}
-  	}, {
-  		key: "notOk",
-  		value: function notOk(result, message) {
-  			if (!message) {
-  				message = !result ? "okay" : "failed, expected argument to be falsy, was: " + dump.parse(result);
-  			}
-
-  			this.pushResult({
-  				result: !result,
-  				actual: result,
-  				expected: false,
   				message: message
   			});
   		}
