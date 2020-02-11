@@ -13,6 +13,7 @@
 // - forking_range_solver.c
 // - serial_range_solver.c
 #include <pthread.h>
+#define FCS_WITHOUT_RANGE_MAIN_FUNC
 #include "range_solvers.h"
 #include "try_param.h"
 #include "print_time.h"
@@ -34,10 +35,11 @@ static void print_help(void)
 
 static const pthread_mutex_t initial_mutex_constant = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t next_board_num_lock;
-static long long next_board_num, stop_at, past_end_board, board_num_step = 1;
+static long long next_board_num=1;
+const long long board_num_step = 16;
+const long long stop_at = 4000;
+const long long past_end_board = 32001;
 #ifndef FCS_USE_PRECOMPILED_CMD_LINE_THEME
-static char **context_argv;
-static int arg = 1, context_argc;
 #endif
 static fcs_iters_int total_num_iters = 0;
 
@@ -49,7 +51,7 @@ static void *worker_thread(void *const void_arg)
     void *const instance = simple_alloc_and_parse(0, NULL, 0);
 #else
     void *const instance =
-        simple_alloc_and_parse(context_argc, context_argv, arg);
+        simple_alloc_and_parse(0, NULL, 0);
 #endif
     typeof(total_num_iters) total_num_iters_temp = 0;
     long long board_num;
@@ -84,43 +86,12 @@ theme_error:
     return NULL;
 }
 
-static inline int range_solvers_main(int argc, char *argv[], const int par__arg,
-    const long long par__next_board_num, const long long par__end_board,
-    const long long par__stop_at)
+static inline int range_solvers_main()
 {
     next_board_num_lock = initial_mutex_constant;
-#ifdef FCS_USE_PRECOMPILED_CMD_LINE_THEME
-    int arg = par__arg;
-#else
-    arg = par__arg;
-#endif
-    next_board_num = par__next_board_num;
-    past_end_board = 1 + par__end_board;
-    stop_at = par__stop_at;
 
-    size_t num_workers = 3;
-    for (; arg < argc; ++arg)
-    {
-        const char *param;
-        if ((param = TRY_P("--num-workers")))
-        {
-            num_workers = (size_t)atol(param);
-        }
-        else if ((param = TRY_P("--worker-step")))
-        {
-            board_num_step = atoll(param);
-        }
-        else
-        {
-            break;
-        }
-    }
-
+    const size_t num_workers = 4;
     fc_solve_print_started_at();
-#ifndef FCS_USE_PRECOMPILED_CMD_LINE_THEME
-    context_argc = argc;
-    context_argv = argv;
-#endif
     pthread_t workers[num_workers];
     typeof(total_num_iters) num_iters[num_workers];
     for (size_t idx = 0; idx < num_workers; ++idx)
@@ -144,4 +115,9 @@ static inline int range_solvers_main(int argc, char *argv[], const int par__arg,
     fc_solve_print_finished(total_num_iters);
 
     return 0;
+}
+
+int main(int argc, char *argv[])
+{
+    return range_solvers_main();
 }

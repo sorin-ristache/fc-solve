@@ -17,6 +17,7 @@
 #include <sys/epoll.h>
 #endif
 #include <sys/wait.h>
+#define FCS_WITHOUT_RANGE_MAIN_FUNC
 #include "range_solvers.h"
 #include "try_param.h"
 #include "print_time.h"
@@ -108,31 +109,16 @@ static inline int read_fd(const fcs_worker *const worker)
     return worker->child_to_parent_pipe[READ_FD];
 }
 
-static inline int range_solvers_main(int argc, char *argv[], int arg,
-    long long next_board_num, const long long end_board,
-    const long long stop_at)
+static long long next_board_num=1;
+const long long board_num_step = 16;
+const long long stop_at = 4000;
+const long long end_board = 32000;
+static inline int range_solvers_main()
 {
-    size_t num_workers = 3;
-    long long board_num_step = 1;
-    for (; arg < argc; ++arg)
-    {
-        const char *param;
-        if ((param = TRY_P("--num-workers")))
-        {
-            num_workers = (size_t)atoi(param);
-        }
-        else if ((param = TRY_P("--worker-step")))
-        {
-            board_num_step = atoll(param);
-        }
-        else
-        {
-            break;
-        }
-    }
-
+    const size_t num_workers = 4;
+    const long long board_num_step = 16;
     fc_solve_print_started_at();
-    void *const instance = simple_alloc_and_parse(argc, argv, arg);
+    void *const instance = simple_alloc_and_parse(0, NULL, 0);
     fcs_worker workers[num_workers];
 
     for (size_t idx = 0; idx < num_workers; ++idx)
@@ -307,4 +293,9 @@ static inline int range_solvers_main(int argc, char *argv[], int arg,
     }
     fc_solve_print_finished(total_num_iters);
     return 0;
+}
+
+int main(int argc, char *argv[])
+{
+    return range_solvers_main();
 }

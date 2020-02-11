@@ -58,6 +58,7 @@ static inline bool range_solvers__solve(char *const state_string,
     return false;
 }
 
+#ifndef FCS_WITHOUT_RANGE_MAIN_FUNC
 static inline int range_solvers_main(
     int argc, char *argv[], int arg, long long, long long, long long);
 int main(int argc, char *argv[])
@@ -86,3 +87,4 @@ int main(int argc, char *argv[])
     return range_solvers_main(
         argc, argv, arg, next_board_num, end_board, stop_at);
 }
+#endif
